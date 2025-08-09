@@ -51,6 +51,19 @@ import pss.www.platform.applications.JHistory;
 import pss.www.platform.applications.JHistoryProvider;
 import pss.www.platform.users.history.BizUserHistory;
 
+/**
+ * Resolves and executes actions originating from a {@link JWebRequest}.
+ * <p>
+ * The resolver is the core of the request lifecycle: it locates the target
+ * window, determines the {@link BizAction} to execute and delegates the
+ * processing of the underlying {@link JAct} to a chain of
+ * {@link ActionResolverStrategy} implementations. Each strategy decides how to
+ * handle the submit (e.g. redirects, back navigation, regular submits).
+ * </p>
+ * In addition, the resolver manages the registration of objects in the
+ * session, keeps track of modal windows and stores user statistics about the
+ * executed action.
+ */
 public class JDoPssActionResolver extends JIndoorsActionResolver implements IControlToBD {
 
         boolean resetRegisteredObjects=true;

@@ -46,6 +46,17 @@ import pss.www.ui.controller.JFrontDoorUICoordinator;
 import pss.www.ui.processing.JWebActionRequestProcessor;
 import pss.www.ui.processing.JWebUICoordinator;
 
+/**
+ * Wrapper around the servlet {@link Request} that provides convenient access
+ * to request parameters, session data and registered application objects.
+ * <p>
+ * A {@code JWebRequest} is created by the {@link JWebActionRequestProcessor}
+ * and remains associated with the processing thread through
+ * {@link JWebActionFactory#CURRENT_REQUEST}. It also exposes a
+ * {@link JWebRequestPackage} that captures the state of registered objects and
+ * history information for serialization.
+ * </p>
+ */
 public class JWebRequest {
 
 	private Request oServletRequest;
@@ -59,9 +70,14 @@ public class JWebRequest {
 	private Map<String, String> oRegisteredObjectsOld;
 	private JWebHistoryManager oHistoryManager;
 
-	public class JWebRequestPackage {
-		private Map<String, String> localRegisteredObject;
-		private JLocalHistoryManager localHistoryManager;
+        /**
+         * Lightweight snapshot of the request's registered objects and history
+         * manager. It is primarily used to serialize the server-side state back
+         * to the client when needed.
+         */
+        public class JWebRequestPackage {
+                private Map<String, String> localRegisteredObject;
+                private JLocalHistoryManager localHistoryManager;
 
 //		@Override
 //	  public String toString() {
