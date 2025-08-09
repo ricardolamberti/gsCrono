@@ -766,7 +766,7 @@ public class JWebRequest {
 			String dictionary = getPssIdDictionary();
 			if (dictionary == null || dictionary.isEmpty())
 				return;
-			pack = (JWebRequestPackage) JWebRequestSerializer.deserializeRegisterJSON(dictionary);
+			JWebRequestPackage pack = (JWebRequestPackage) JWebRequestSerializer.deserializeRegisterJSON(dictionary);
 			if (getHistoryManager().sizeHistory()==0) {
 				getHistoryManager().deserializeHistoryManager(pack.localHistoryManager);
 				factory.fillHistory();

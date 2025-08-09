@@ -6,7 +6,7 @@ import pss.www.platform.actions.results.JWebActionResult;
 
 public class RedirectActionResolver implements ActionResolverStrategy {
     @Override
-    public boolean supports(JDoPssActionResolver context, JAct submit) {
+    public boolean supports(JDoPssActionResolver context, JAct submit) throws Exception {
         return submit.getFinalSubmit() instanceof JActFileGenerate;
     }
 

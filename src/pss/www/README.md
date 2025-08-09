@@ -47,15 +47,5 @@ JWebActionResult → componentes UI (`JWebView`, `JWebWinForm`, ...)
 - `JWebActionRequestProcessor`: interfaz que inicializa el contexto de aplicación y crea `JWebRequest`.
 - `JWebApplication` / `JWebApplicationSession`: representan la aplicación y la sesión del usuario.
 - `JWebView`, `JWebWinForm` y demás componentes en `ui` construyen la respuesta HTML.
-- `JWebRequestSerializer`: serializa y deserializa el estado de la sesión para mantener `JWebRequest` y ventanas entre peticiones.
-
-## Resolutores clave
-
-| Resolver | Responsabilidad |
-|----------|----------------|
-| `JDoPssActionResolver` | Resolver general de acciones PSS generadas desde la UI. |
-| `JFrontDoorActionResolver` | Punto de entrada para peticiones externas o iniciales. |
-| `JDoLoginResolver` | Manejo del proceso de autenticación. |
-| `JDoAjaxActionResolver` | Atención de solicitudes AJAX parciales. |
 
 Este README resume la finalidad de los subpaquetes y cómo interactúan para servir una solicitud web.

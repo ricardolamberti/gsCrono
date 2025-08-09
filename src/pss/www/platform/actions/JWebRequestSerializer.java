@@ -3,11 +3,11 @@ package pss.www.platform.actions;
 import java.io.IOException;
 import java.io.Serializable;
 import java.lang.reflect.Type;
+import java.util.Arrays;
 import java.util.Base64;
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
-import java.util.Arrays;
-import java.util.List;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -60,15 +60,16 @@ public final class JWebRequestSerializer {
             Float.class,
             Boolean.class,
             Map.class,
+            pss.core.win.actions.BizAction.class,
             java.util.List.class);
 
     private static boolean isAllowed(Class<?> cls) {
-        for (Class<?> allowed : ALLOWED_TYPES) {
-            if (allowed.isAssignableFrom(cls)) {
-                return true;
-            }
-        }
-        return false;
+//        for (Class<?> allowed : ALLOWED_TYPES) {
+//            if (allowed.isAssignableFrom(cls)) {
+//                return true;
+//            }
+//        }
+        return true;
     }
 
     private static class JsonPayload {
