@@ -2,6 +2,13 @@ package pss.core.win.submits;
 
 import pss.core.win.JBaseWin;
 
+/**
+ * Action that removes the current record from the data source.
+ * <p>
+ * The action is marked as a submit-only operation and it will update the
+ * navigation flow after the deletion is performed.
+ * </p>
+ */
 public class JActDelete extends JAct {
 
 /**
@@ -18,8 +25,8 @@ public class JActDelete extends JAct {
 
 	@Override
 	public void Do() throws Exception {
-//		if (!UITools.showConfirmation("Confirmación",
-//				"¿Está seguro que desea borrar el registro?"))
+//		if (!UITools.showConfirmation("ConfirmaciÃ³n",
+//				"Â¿EstÃ¡ seguro que desea borrar el registro?"))
 //			return;
 		this.submit();
 	}

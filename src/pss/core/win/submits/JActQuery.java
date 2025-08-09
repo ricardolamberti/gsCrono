@@ -4,6 +4,13 @@ import pss.core.tools.PssLogger;
 import pss.core.win.JWin;
 import pss.core.winUI.forms.JBaseForm;
 
+/**
+ * Action used to display the data of a record without modifying it.
+ * <p>
+ * Generates a read-only form from the target window and marks the action as
+ * part of the navigation history so the user can return to previous screens.
+ * </p>
+ */
 public class JActQuery extends JAct {
 
 	public JActQuery(JWin zResult) {

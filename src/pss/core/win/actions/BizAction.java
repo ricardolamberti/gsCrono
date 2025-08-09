@@ -25,6 +25,15 @@ import pss.core.winUI.forms.JBaseForm;
 import pss.core.winUI.icons.GuiIconos;
 import pss.www.platform.actions.JWebActionFactory;
 
+/**
+ * Represents a configurable action within a window.
+ * <p>
+ * Each {@code BizAction} defines the behavior executed from the UI, the
+ * security restrictions that apply and the visual aspects used when rendering
+ * the action. Instances are usually attached to {@link pss.core.win.JBaseWin}
+ * components and can in turn own child actions forming a hierarchy.
+ * </p>
+ */
 public class BizAction extends JRecord {
 
 	private JBaseWin owner = null;
@@ -180,7 +189,7 @@ public class BizAction extends JRecord {
 	protected boolean uploaddata=false;
 	protected boolean isSubmitedByUser=false;
 
-	// Esto sólo se utiliza en casos muy puntuales y se inicializa on demand
+	// Esto sÃ³lo se utiliza en casos muy puntuales y se inicializa on demand
 	// private JList oFiltros = null;
 	// public void addFiltro( RFilter zFiltro ) {
 	// if( oFiltros == null ) oFiltros = JCollectionFactory.createList();
@@ -570,8 +579,8 @@ public class BizAction extends JRecord {
 
 	@Override
 	public void createFixedProperties() throws Exception {
-		this.addFixedItem(KEY, "accion", "Operación", true, true, 20);
-		this.addFixedItem(FIELD, "descripcion", "Descripción", true, true, 50);
+		this.addFixedItem(KEY, "accion", "OperaciÃ³n", true, true, 20);
+		this.addFixedItem(FIELD, "descripcion", "DescripciÃ³n", true, true, 50);
 		this.addFixedItem(FIELD, "nro_icono", "Nro Icono", true, true, 3);
 		this.addFixedItem(VIRTUAL, "restringido", "Restringido", true, true, 1);
 	}

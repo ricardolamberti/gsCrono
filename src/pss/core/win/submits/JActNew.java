@@ -3,6 +3,14 @@ package pss.core.win.submits;
 import pss.core.win.JBaseWin;
 import pss.core.winUI.forms.JBaseForm;
 
+/**
+ * Action responsible for inserting a new record.
+ * <p>
+ * Depending on the state of the backing record it can display either a new
+ * form or, if the record already exists, an update form. The behaviour can be
+ * customised through several constructor flags.
+ * </p>
+ */
 public class JActNew extends JActModify {
 
 	/**

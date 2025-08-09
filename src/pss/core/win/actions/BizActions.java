@@ -4,6 +4,13 @@ import pss.core.services.records.JRecords;
 import pss.core.tools.JTools;
 import pss.core.tools.collections.JIterator;
 
+/**
+ * Collection of {@link BizAction} objects used by a window.
+ * <p>
+ * Provides helper methods for searching actions by identifier or unique name
+ * and for cloning the whole set of actions when required by the UI layer.
+ * </p>
+ */
 public class BizActions extends JRecords<BizAction> {
 
 	public BizActions() throws Exception {

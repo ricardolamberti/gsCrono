@@ -2,6 +2,14 @@ package pss.core.win.submits;
 
 import pss.core.win.JBaseWin;
 
+/**
+ * Basic action that simply submits the current window without opening any
+ * additional UI.
+ * <p>
+ * It is commonly used for operations that only execute server side logic and
+ * then return to the same context.
+ * </p>
+ */
 public class JActSubmit extends JAct {
 		
 	/**
@@ -22,7 +30,7 @@ public class JActSubmit extends JAct {
 ////		JAct submit = this;
 //		if (this.hasActionId()) {
 //			BizAction action = this.getResult().findAction(this.getActionId());
-//			if (action.hasConfirmMessage() &&	!UITools.showConfirmation("Confirmación", action.getConfirmMessageDescription()))
+//			if (action.hasConfirmMessage() &&	!UITools.showConfirmation("ConfirmaciÃ³n", action.getConfirmMessageDescription()))
 //				return;
 ////			submit = action.getSubmit();
 //		}
