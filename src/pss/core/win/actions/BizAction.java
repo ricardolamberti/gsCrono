@@ -557,8 +557,8 @@ public class BizAction extends JRecord {
          * @return {@code true} if the full action must be serialized, {@code false}
          *         otherwise.
          */
-        public boolean needsFullSerialization() {
-                return false;
+        public boolean needsFullSerialization() throws Exception {
+                return  getIdAction().startsWith("anonimus_");
         }
 
 	public JWin getObjWinOwner() {
