@@ -24,6 +24,11 @@ import java.util.TreeMap;
 import java.security.MessageDigest;
 import java.util.zip.Deflater;
 import java.util.zip.Inflater;
+import java.time.Duration;
+import java.util.UUID;
+
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
 
 import org.apache.cocoon.environment.Request;
 
@@ -68,10 +73,20 @@ public class JWebRequest {
 	private Map<String, Object> oObjectMap;
 	private JMap<String, Object> oRegisteredRequest;
 	
-	private Map<String, String> oNameDictionary;
-	private Map<String, String> oRegisteredObjectsNew;
-	private Map<String, String> oRegisteredObjectsOld;
-	private JWebHistoryManager oHistoryManager;
+        private Map<String, String> oNameDictionary;
+        private Map<String, String> oRegisteredObjectsNew;
+        private Map<String, String> oRegisteredObjectsOld;
+        private JWebHistoryManager oHistoryManager;
+
+       // Cache for large or server-only objects
+       private static final String CACHE_PREFIX = "cache:";
+       private static final long CACHE_MAX_SIZE = Long.getLong("jwebrequest.cache.maxSize", 1000L);
+       private static final long CACHE_EXPIRE_MINUTES = Long.getLong("jwebrequest.cache.expireMinutes", 10L);
+       private static final Cache<String, Serializable> LARGE_OBJECT_CACHE =
+                       Caffeine.newBuilder()
+                                       .maximumSize(CACHE_MAX_SIZE)
+                                       .expireAfterAccess(Duration.ofMinutes(CACHE_EXPIRE_MINUTES))
+                                       .build();
 
         /**
          * Lightweight snapshot of the request's registered objects and history
@@ -710,47 +725,73 @@ public class JWebRequest {
                 return pos;
         }
 
-	public synchronized String registerObjectObj(Serializable zObject) throws Exception {
-		return registerObjectObj(zObject, false);
-	}
+       private boolean isLargeObject(Object obj) {
+               // Placeholder for real implementation or marker interface check
+               return false;
+       }
+
+       public static void purgeExpiredCache() {
+               LARGE_OBJECT_CACHE.cleanUp();
+       }
+
+        public synchronized String registerObjectObj(Serializable zObject) throws Exception {
+                return registerObjectObj(zObject, false);
+        }
 
 	public synchronized String registerObjectTemp(Serializable zObject) throws Exception {
 		return registerObjectObj(zObject, true);
 	}
 
-        public synchronized String registerObjectObj(Serializable zObject, boolean temp) throws Exception {
-                if (temp && zObject instanceof JBaseWin)
-                        return registerWinObjectObj((JBaseWin) zObject);
-                String payload = serializeObject(zObject);
-                String id = "obj_p_" + sha256(JTools.stringToByteArray(payload));
-                if (reuseIfPresent(id) != null)
-                        return id;
-                this.getRegisteredObjectsNew().put(id, payload);
-                return id;
-        }
+       public synchronized String registerObjectObj(Serializable zObject, boolean temp) throws Exception {
+               if (temp && zObject instanceof JBaseWin)
+                       return registerWinObjectObj((JBaseWin) zObject);
+               if (isLargeObject(zObject)) {
+                       String id = "obj_c_" + UUID.randomUUID().toString();
+                       LARGE_OBJECT_CACHE.put(id, zObject);
+                       getRegisteredObjectsNew().put(id, CACHE_PREFIX + id);
+                       return id;
+               }
+               String payload = serializeObject(zObject);
+               String id = "obj_p_" + sha256(JTools.stringToByteArray(payload));
+               if (reuseIfPresent(id) != null)
+                       return id;
+               this.getRegisteredObjectsNew().put(id, payload);
+               return id;
+       }
 
-        Map<String, String> objectsCreated = new HashMap<String, String>();
+       Map<String, String> objectsCreated = new HashMap<String, String>();
 
-        public synchronized String registerWinObjectObj(JBaseWin zObject) throws Exception {
-                if (objectsCreated.containsKey(zObject.getUniqueId()))
-                        return objectsCreated.get(zObject.getUniqueId());
-                String json = new JWebWinFactory(null).baseWinToJSON(zObject);
-                String out = "obj_t_" + b64url(deflate(JTools.stringToByteArray(json)));
-                objectsCreated.put(zObject.getUniqueId(), out);
-                return out;
-        }
+       public synchronized String registerWinObjectObj(JBaseWin zObject) throws Exception {
+               if (isLargeObject(zObject)) {
+                       String id = zObject.getUniqueId() != null ? zObject.getUniqueId() : UUID.randomUUID().toString();
+                       LARGE_OBJECT_CACHE.put(id, zObject);
+                       getRegisteredObjectsNew().put(id, CACHE_PREFIX + id);
+                       return CACHE_PREFIX + id;
+               }
+               if (objectsCreated.containsKey(zObject.getUniqueId()))
+                       return objectsCreated.get(zObject.getUniqueId());
+               String json = new JWebWinFactory(null).baseWinToJSON(zObject);
+               String out = "obj_t_" + b64url(deflate(JTools.stringToByteArray(json)));
+               objectsCreated.put(zObject.getUniqueId(), out);
+               return out;
+       }
 
-        public synchronized String registerRecObjectObj(JBaseRecord zObject) throws Exception {
-                if (zObject == null)
-                        return null;
-                String key = zObject.getUniqueId();
-                if (reuseIfPresent(key) != null)
-                        return key;
-                String json = new JWebWinFactory(null).baseRecToJSON(zObject);
-                String payload = "obj_rec_" + b64url(deflate(JTools.stringToByteArray(json)));
-                getRegisteredObjectsNew().put(key, payload);
-                return key;
-        }
+       public synchronized String registerRecObjectObj(JBaseRecord zObject) throws Exception {
+               if (zObject == null)
+                       return null;
+               String key = zObject.getUniqueId();
+               if (reuseIfPresent(key) != null)
+                       return key;
+               if (isLargeObject(zObject)) {
+                       LARGE_OBJECT_CACHE.put(key, zObject);
+                       getRegisteredObjectsNew().put(key, CACHE_PREFIX + key);
+                       return key;
+               }
+               String json = new JWebWinFactory(null).baseRecToJSON(zObject);
+               String payload = "obj_rec_" + b64url(deflate(JTools.stringToByteArray(json)));
+               getRegisteredObjectsNew().put(key, payload);
+               return key;
+       }
 
         public Serializable getRegisterObject(String key) {
                 String obj = getRegisteredObjectsOld().get(key);
@@ -759,11 +800,14 @@ public class JWebRequest {
                         return null;
                 }
                 try {
-                        if (obj.startsWith("obj_t:")) {
-                                return (Serializable) fetchFromCache(obj.substring(6));
-                        }
-                        if (obj.startsWith("obj_rec:")) {
-                                return (Serializable) fetchFromCache(obj.substring(8));
+                       if (obj.startsWith(CACHE_PREFIX)) {
+                               return LARGE_OBJECT_CACHE.getIfPresent(obj.substring(CACHE_PREFIX.length()));
+                       }
+                       if (obj.startsWith("obj_t:")) {
+                               return (Serializable) fetchFromCache(obj.substring(6));
+                       }
+                       if (obj.startsWith("obj_rec:")) {
+                               return (Serializable) fetchFromCache(obj.substring(8));
                         }
                         if (obj.startsWith("obj_t_")) {
                                 String payload = obj.substring(6);
@@ -817,16 +861,18 @@ public class JWebRequest {
 
         public String buildOutgoingDictionary(java.util.List<String> holds) throws Exception {
                 ReconcileResult rr = reconcileDictionaries(holds);
-                for (String k : rr.evict) {
-                        String val = getRegisteredObjectsOld().get(k);
-                        if (val != null) {
-                                if (val.startsWith("obj_t:")) {
-                                        invalidateHandle(val.substring(6));
-                                } else if (val.startsWith("obj_rec:")) {
-                                        invalidateHandle(val.substring(8));
-                                }
-                        }
-                }
+               for (String k : rr.evict) {
+                       String val = getRegisteredObjectsOld().get(k);
+                       if (val != null) {
+                               if (val.startsWith(CACHE_PREFIX)) {
+                                       LARGE_OBJECT_CACHE.invalidate(val.substring(CACHE_PREFIX.length()));
+                               } else if (val.startsWith("obj_t:")) {
+                                       invalidateHandle(val.substring(6));
+                               } else if (val.startsWith("obj_rec:")) {
+                                       invalidateHandle(val.substring(8));
+                               }
+                       }
+               }
                 pack.localRegisteredObject = getRegisteredObjectsNew();
                 pack.localHistoryManager = getHistoryManager().serializeHistoryManager();
                 return serializeRegisterJSON(pack);
