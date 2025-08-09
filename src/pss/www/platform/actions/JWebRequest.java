@@ -6,29 +6,26 @@
 
 package pss.www.platform.actions;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+import java.nio.charset.StandardCharsets;
 
 import org.apache.cocoon.environment.Request;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import com.google.gson.JsonObject;
 
 import pss.core.services.records.JBaseRecord;
-import pss.core.tools.JTools;
 import pss.core.tools.PssLogger;
 import pss.core.tools.collections.JCollectionFactory;
 import pss.core.tools.collections.JIterator;
@@ -677,14 +674,14 @@ public class JWebRequest {
 	public synchronized String registerWinObjectObj(JBaseWin zObject) throws Exception {
 		if (objectsCreated.containsKey(zObject.getUniqueId())) return objectsCreated.get(zObject.getUniqueId());
 		
-		String out= "obj_t_"+ Base64.getEncoder().encodeToString(JTools.stringToByteArray(new JWebWinFactory(null).baseWinToJSON(zObject)));
+                String out= "obj_t_"+ Base64.getEncoder().encodeToString(new JWebWinFactory(null).baseWinToJSON(zObject).getBytes(StandardCharsets.UTF_8));
 		objectsCreated.put(zObject.getUniqueId(),out);
 		return out;
 		
 	}
 	public synchronized String registerRecObjectObj(JBaseRecord zObject) throws Exception {
 		if (objectsCreated.containsKey(zObject.getUniqueId())) return objectsCreated.get(zObject.getUniqueId());
-		String out= "obj_rec_"+ Base64.getEncoder().encodeToString(JTools.stringToByteArray(new JWebWinFactory(null).baseRecToJSON(zObject)));
+                String out= "obj_rec_"+ Base64.getEncoder().encodeToString(new JWebWinFactory(null).baseRecToJSON(zObject).getBytes(StandardCharsets.UTF_8));
 		objectsCreated.put(zObject.getUniqueId(),out);
 		return out;
 	}
@@ -798,56 +795,72 @@ public class JWebRequest {
 
 	public String serializeRegisterMapJSON(Map<String,String> pack) {
 		Gson gson = new Gson();
-		String serializedMap = gson.toJson(pack);
-		return Base64.getEncoder().encodeToString(JTools.stringToByteArray(serializedMap));
+                String serializedMap = gson.toJson(pack);
+                return Base64.getEncoder().encodeToString(serializedMap.getBytes(StandardCharsets.UTF_8));
 	}
 	
 	public Map<String,String> deserializeRegisterMapJSON(String serializedDictionary) {
 		Map<String,String> map = new TreeMap<String,String>();
-		Gson gson = new Gson();
-		Type type = new TypeToken<Map<String,String>>() {}.getType();
-  	map = gson.fromJson(JTools.byteVectorToString(Base64.getDecoder().decode(serializedDictionary)), type);
-		return map;
+                Gson gson = new Gson();
+                Type type = new TypeToken<Map<String,String>>() {}.getType();
+        map = gson.fromJson(new String(Base64.getDecoder().decode(serializedDictionary), StandardCharsets.UTF_8), type);
+                return map;
 	}
 	
 	public String serializeRegisterJSON(JWebRequestPackage pack) {
 		Gson gson = new Gson();
-		String serializedMap = gson.toJson(pack);
-		return Base64.getEncoder().encodeToString(JTools.stringToByteArray(serializedMap));
+                String serializedMap = gson.toJson(pack);
+                return Base64.getEncoder().encodeToString(serializedMap.getBytes(StandardCharsets.UTF_8));
 	}
 	
 	public JWebRequestPackage deserializeRegisterJSON(String serializedDictionary) {
 		JWebRequestPackage map = new JWebRequestPackage();
-		Gson gson = new Gson();
-		Type type = new TypeToken<JWebRequestPackage>() {}.getType();
-  	map = gson.fromJson(JTools.byteVectorToString(Base64.getDecoder().decode(serializedDictionary)), type);
-		return map;
+                Gson gson = new Gson();
+                Type type = new TypeToken<JWebRequestPackage>() {}.getType();
+        map = gson.fromJson(new String(Base64.getDecoder().decode(serializedDictionary), StandardCharsets.UTF_8), type);
+                return map;
 	}
 	
-	public static String serializeObject(Serializable obj) throws IOException {
-		ByteArrayOutputStream baos = new ByteArrayOutputStream();
-		ObjectOutputStream oos = new ObjectOutputStream(baos);
-		oos.writeObject(obj);
-		oos.close();
-		return Base64.getEncoder().encodeToString(baos.toByteArray());
-	}
+        private static final List<String> ALLOWED_PACKAGES = Arrays.asList(
+                        "pss.",
+                        "java.lang.",
+                        "java.util.");
 
-	public static Serializable deserializeObject(String serializedObj)  {
-		try {
-			if (serializedObj==null) return null;
-			byte[] data = Base64.getDecoder().decode(serializedObj);
-			ObjectInputStream ois = new ObjectInputStream(new ByteArrayInputStream(data));
-			Serializable obj = (Serializable) ois.readObject();
-			ois.close();
-			return obj;
-		} catch (ClassNotFoundException e) {
-			PssLogger.logError(e);
-			e.printStackTrace();
-		} catch (IOException e) {
-			PssLogger.logError(e);
-		}
-		return null;
-	}
+        public static String serializeObject(Serializable obj) {
+                if (obj == null)
+                        return null;
+                Gson gson = new Gson();
+                JsonObject wrapper = new JsonObject();
+                wrapper.addProperty("class", obj.getClass().getName());
+                wrapper.add("data", gson.toJsonTree(obj));
+                return gson.toJson(wrapper);
+        }
+
+        public static Serializable deserializeObject(String serializedObj) {
+                try {
+                        if (serializedObj == null)
+                                return null;
+                        Gson gson = new Gson();
+                        JsonObject wrapper = gson.fromJson(serializedObj, JsonObject.class);
+                        String className = wrapper.get("class").getAsString();
+                        if (!isAllowedClass(className))
+                                throw new SecurityException("Unauthorized class: " + className);
+                        Class<?> clazz = Class.forName(className);
+                        Object obj = gson.fromJson(wrapper.get("data"), clazz);
+                        return (Serializable) obj;
+                } catch (Exception e) {
+                        PssLogger.logError(e);
+                }
+                return null;
+        }
+
+        private static boolean isAllowedClass(String className) {
+                for (String prefix : ALLOWED_PACKAGES) {
+                        if (className.startsWith(prefix))
+                                return true;
+                }
+                return false;
+        }
 
 	public static String baseWinToSession(JBaseWin zOwner) throws Exception {
 //	  if (!zOwner.canConvertToURL()) return serializeObject(zOwner);
