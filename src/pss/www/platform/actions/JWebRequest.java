@@ -692,37 +692,47 @@ public class JWebRequest {
 		return id;
 	}
 	Map <String,String> objectsCreated = new HashMap<String, String>();
-	public synchronized String registerWinObjectObj(JBaseWin zObject) throws Exception {
-		if (objectsCreated.containsKey(zObject.getUniqueId())) return objectsCreated.get(zObject.getUniqueId());
-		
-		String out= "obj_t_"+ Base64.getEncoder().encodeToString(JTools.stringToByteArray(new JWebWinFactory(null).baseWinToJSON(zObject)));
-		objectsCreated.put(zObject.getUniqueId(),out);
-		return out;
-		
-	}
-	public synchronized String registerRecObjectObj(JBaseRecord zObject) throws Exception {
-		if (objectsCreated.containsKey(zObject.getUniqueId())) return objectsCreated.get(zObject.getUniqueId());
-		String out= "obj_rec_"+ Base64.getEncoder().encodeToString(JTools.stringToByteArray(new JWebWinFactory(null).baseRecToJSON(zObject)));
-		objectsCreated.put(zObject.getUniqueId(),out);
-		return out;
-	}
+        public synchronized String registerWinObjectObj(JBaseWin zObject) throws Exception {
+                if (objectsCreated.containsKey(zObject.getUniqueId())) return objectsCreated.get(zObject.getUniqueId());
+                String json = new JWebWinFactory(null).baseWinToJSON(zObject);
+                String out = "obj_t_" + b64url(deflate(JTools.stringToByteArray(json)));
+                objectsCreated.put(zObject.getUniqueId(),out);
+                return out;
+        }
+        public synchronized String registerRecObjectObj(JBaseRecord zObject) throws Exception {
+                if (objectsCreated.containsKey(zObject.getUniqueId())) return objectsCreated.get(zObject.getUniqueId());
+                String json = new JWebWinFactory(null).baseRecToJSON(zObject);
+                String out = "obj_rec_" + b64url(deflate(JTools.stringToByteArray(json)));
+                objectsCreated.put(zObject.getUniqueId(),out);
+                return out;
+        }
 
-	public Serializable getRegisterObject(String key) {
-//	PssLogger.logDebug("THREAD ------------------------------> try getRegisterObject "+getOldIdDictionary()+"("+key+"): ");
-		String obj;
-//		if (key.startsWith("obj_t_")) {
-////			obj = (String) JTools.byteVectorToString(Base64.getDecoder().decode(key.substring(6)));
-//			obj =key.substring(6);
-//		} else {
-			obj = getRegisteredObjectsOld().get(key);
-			if (obj==null) {
-				PssLogger.logError("Falta objeto");
-			}
-//		}
-//	PssLogger.logDebug("THREAD ------------------------------> getRegisterObject "+getOldIdDictionary()+"("+key+"): "+(obj==null?"NO ENCONTRADO":"OK"));
-		return deserializeObject(obj);
-	}
-
+        public Serializable getRegisterObject(String key) {
+//      PssLogger.logDebug("THREAD ------------------------------> try getRegisterObject "+getOldIdDictionary()+"("+key+"): ");
+                String obj = getRegisteredObjectsOld().get(key);
+                if (obj==null) {
+                        PssLogger.logError("Falta objeto");
+                        return null;
+                }
+                try {
+                        if (obj.startsWith("obj_t_")) {
+                                String payload = obj.substring(6);
+                                byte[] raw = inflate(b64urlDecode(payload));
+                                String json = JTools.byteVectorToString(raw);
+                                return new JWebWinFactory(null).jsonToBaseWin(json);
+                        }
+                        if (obj.startsWith("obj_rec_")) {
+                                String payload = obj.substring(8);
+                                byte[] raw = inflate(b64urlDecode(payload));
+                                String json = JTools.byteVectorToString(raw);
+                                return new JWebWinFactory(null).jsonToBaseRec(json);
+                        }
+                        return deserializeObject(obj);
+                } catch (Exception e) {
+                        PssLogger.logError(e);
+                        return null;
+                }
+        }
 	public synchronized String registerObject(JBaseWin zBaseWin) throws Exception {
 		if (zBaseWin == null)
 			return null;
@@ -914,7 +924,10 @@ public class JWebRequest {
 //		if (zOwner.isModeWinLov()) return serializeObject(zOwner);
 //		if (!zOwner.isReaded()) return serializeObject(zOwner);
 
-		return serializeObject(new JWebWinFactory(null).baseWinToJSON(zOwner));
+		String json = new JWebWinFactory(null).baseWinToJSON(zOwner);
+                byte[] raw = JTools.stringToByteArray(json);
+                String packed = b64url(deflate(raw));
+                return "obj_t_" + packed;
 	}
 	
 

@@ -899,13 +899,21 @@ public class JWebWinFactory {
 		return Base64.getEncoder().encodeToString(json.getBytes(StandardCharsets.UTF_8));
 	}
 
-	public String baseRecToJSON(JBaseRecord rec) throws Exception {
-		JSerializableBaseWin serializableWin = prepareSerializableRec(rec, false);
-		String json = objectMapper.writeValueAsString(serializableWin);
+        public String baseRecToJSON(JBaseRecord rec) throws Exception {
+                JSerializableBaseWin serializableWin = prepareSerializableRec(rec, false);
+                String json = objectMapper.writeValueAsString(serializableWin);
 
-		// Codificar en Base64
-		return Base64.getEncoder().encodeToString(json.getBytes(StandardCharsets.UTF_8));
-	}
+                // Codificar en Base64
+                return Base64.getEncoder().encodeToString(json.getBytes(StandardCharsets.UTF_8));
+        }
+
+        public JBaseWin jsonToBaseWin(String json) throws Exception {
+                return createWin(json, null);
+        }
+
+        public JBaseRecord jsonToBaseRec(String json) throws Exception {
+                return createRec(json, null);
+        }
 
 	// Método para deserializar desde JSON (como JAct u otros objetos)
 	public Object deserializeObject(String json, Class<?> clazz) throws IOException {
