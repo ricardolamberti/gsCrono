@@ -85,6 +85,11 @@ import pss.core.winUI.responsiveControls.JFormWinLOVResponsive;
 import pss.www.platform.actions.JWebActionFactory;
 import pss.www.ui.JWebIcon;
 
+/**
+ * Clase base para la construcciÃ³n de formularios de la interfaz. Define modos
+ * de operaciÃ³n, controles y utilidades comunes que son reutilizados por los
+ * formularios especÃ­ficos de cada ventana.
+ */
 public class JBaseForm  {
 
 	public final static String MODO_CONSULTA = "C";
@@ -178,10 +183,10 @@ public class JBaseForm  {
 
 	private boolean bVisibleMode = true;
 
-	protected String sTituloOnOk = "Operación Exitosa";
-	protected String sTextoConfir = "¿Está Ud. Seguro?";
+	protected String sTituloOnOk = "OperaciÃ³n Exitosa";
+	protected String sTextoConfir = "Â¿EstÃ¡ Ud. Seguro?";
 
-	protected String sTituloConfir = "Confirmación";
+	protected String sTituloConfir = "ConfirmaciÃ³n";
 
 	int status = 0;
 
@@ -666,9 +671,9 @@ public class JBaseForm  {
 	}
 
 	public void initializeBuild() {
-		sTituloOnOk = "Operación Exitosa";
-		sTextoConfir = "¿Está Ud. Seguro?";
-		sTituloConfir = "Confirmación";
+		sTituloOnOk = "OperaciÃ³n Exitosa";
+		sTextoConfir = "Â¿EstÃ¡ Ud. Seguro?";
+		sTituloConfir = "ConfirmaciÃ³n";
 	}
 
 	// -------------------------------------------------------------------------//
@@ -1527,7 +1532,7 @@ public class JBaseForm  {
 		return getInternalPanel().AddItemTab(zId, null);
 	}
 
-	// Additem de un JWins a un JTabbedPane a través de una acción
+	// Additem de un JWins a un JTabbedPane a travÃ©s de una acciÃ³n
 	public JFormLista AddItemTab(int zId, String title) throws Exception {
 		BizAction oAction = getBaseWin().findAction(zId);
 		if (title == null && oAction != null)
@@ -1883,7 +1888,7 @@ public class JBaseForm  {
 	}
 
 	// Responsable de mostrar/ocultar controles y/o establecer valores default
-	// sobre la base de la composición actual de los controles del formulario.
+	// sobre la base de la composiciÃ³n actual de los controles del formulario.
 	protected void reviewControls() throws Exception {
 	}
 

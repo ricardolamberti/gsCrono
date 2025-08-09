@@ -24,9 +24,13 @@ import pss.core.tools.collections.JMap;
 import pss.core.tools.collections.JStringTokenizer;
 import pss.core.winUI.controls.JFormControl;
 
-//========================================================================== //
-// Clase para un conjunto de datos
-//========================================================================== //
+/**
+ * Conjunto de {@link JRecord}. Provee operaciones para manejar colecciones de
+ * registros, su lectura paginada y filtros sobre la fuente de datos.
+ *
+ * @param <TRecord>
+ *            tipo de registro gestionado.
+ */
 public class JRecords<TRecord extends JRecord> extends JBaseRecord {
 
 	// --------------------------------------------------------------------------
@@ -201,7 +205,7 @@ public class JRecords<TRecord extends JRecord> extends JBaseRecord {
 	 * (JRecord)zClassBD.newInstance(); //
 	 * this.getStructure().setTable(oBD.getStructure().getTable()); //
 	 * this.setStatic(oBD.isStatic()); } catch (Exception e) {
-	 * JExcepcion.SendError("Error en la creación del JDBs^", e.getMessage()); }
+	 * JExcepcion.SendError("Error en la creaciÃ³n del JDBs^", e.getMessage()); }
 	 * }
 	 */
 

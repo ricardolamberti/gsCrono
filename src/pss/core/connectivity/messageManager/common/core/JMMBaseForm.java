@@ -20,6 +20,11 @@ import pss.core.winUI.controls.JFormLista;
 import pss.core.winUI.forms.JBaseForm;
 
 
+/**
+ * Implementación base de formularios para el Message Manager. Extiende
+ * {@link JBaseForm} agregando utilidades específicas para la configuración y
+ * manejo de ventanas del subsistema de mensajería.
+ */
 public class JMMBaseForm extends JBaseForm {
 //	private JTabbedPane jChildPanel = null;
 //	private static int BORDER = 10;

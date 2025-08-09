@@ -19,6 +19,11 @@ import pss.core.win.totalizer.JTotalizer.Properties;
 import pss.core.winUI.forms.JBaseForm;
 //import pss.core.winUI.menu.JWinMenuGenerator;
 
+/**
+ * Representa una lista de {@link JWin} con sus columnas y acciones de
+ * presentación. Provee utilidades para manejar totales, filtros y la
+ * configuración visual de las listas mostradas al usuario.
+ */
 public class JWinList {
 	public static final String PAGETYPE_LANDSCAPE = "PAGETYPE_LANDSCAPE";
 	public static final String PAGETYPE_NORMAL = "PAGETYPE_NORMAL";

@@ -57,6 +57,14 @@ import pss.www.platform.applications.JHistory;
 import pss.www.platform.applications.JHistoryProvider;
 import pss.www.ui.skins.JWebSkin;
 
+/**
+ * ColecciÃ³n de ventanas {@link JWin}. Gestiona listas de ventanas, filtros y
+ * operaciones comunes sobre conjuntos de registros asociados. Las clases que
+ * representan listados o grillas deben extender esta clase.
+ *
+ * @param <TWin>
+ *            tipo concreto de ventana gestionada.
+ */
 public abstract class JWins<TWin extends JWin> extends JBaseWin {
 
 	protected Class<? extends JWin> oWClass;
@@ -342,10 +350,10 @@ public abstract class JWins<TWin extends JWin> extends JBaseWin {
 	}
 
 	public BizAction addActionNew(int zId, String zDesc) throws Exception {
-		return this.addAction(zId, zDesc, KeyEvent.VK_INSERT, null, GuiIcon.MAS_ICON, true, true).setHelp("Permite abrir el formulario de creación de "+GetTitle());
+		return this.addAction(zId, zDesc, KeyEvent.VK_INSERT, null, GuiIcon.MAS_ICON, true, true).setHelp("Permite abrir el formulario de creaciÃ³n de "+GetTitle());
 	}
 	public BizAction addActionNew(String zId, String zDesc) throws Exception {
-		return this.addAction(zId, zDesc, KeyEvent.VK_INSERT, null, GuiIcon.MAS_ICON, true, true).setHelp("Permite abrir el formulario de creación de "+GetTitle());
+		return this.addAction(zId, zDesc, KeyEvent.VK_INSERT, null, GuiIcon.MAS_ICON, true, true).setHelp("Permite abrir el formulario de creaciÃ³n de "+GetTitle());
 	}
 
 	public BizAction addActionReport(int zId, String zDesc) throws Exception {
@@ -1451,7 +1459,7 @@ public abstract class JWins<TWin extends JWin> extends JBaseWin {
 	public boolean checkRefreshOnlyOnUserRequestStrict(BizAction a) throws Exception {
 		if (!hasDynamicFilters(false) && !a.isExport()) {
 				if (a.isSubmitedByUser())
-					setAlert(BizUsuario.getUsr().getMessage("Por favor, refine la busqueda seleccionando algún filtro",null));
+					setAlert(BizUsuario.getUsr().getMessage("Por favor, refine la busqueda seleccionando algÃºn filtro",null));
 				return false;
 		}
 		return true;
