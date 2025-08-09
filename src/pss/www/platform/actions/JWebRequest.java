@@ -661,8 +661,8 @@ public class JWebRequest {
 
 	public synchronized String registerObjectObj(Serializable zObject, boolean temp) throws Exception {
 		if (temp && zObject instanceof JBaseWin) return registerWinObjectObj((JBaseWin)zObject);
-		String id = "obj_p_" + zObject.hashCode();// +
-		this.getRegisteredObjectsNew().put(id, JWebRequestSerializer.serializeObject(zObject));
+                String id = "obj_p_" + zObject.hashCode();// +
+                this.getRegisteredObjectsNew().put(id, JWebRequestSerializer.toJson(zObject));
 		return id;
 	}
 	Map <String,String> objectsCreated = new HashMap<String, String>();
@@ -694,7 +694,7 @@ public class JWebRequest {
 			}
 //		}
 //	PssLogger.logDebug("THREAD ------------------------------> getRegisterObject "+getOldIdDictionary()+"("+key+"): "+(obj==null?"NO ENCONTRADO":"OK"));
-		return JWebRequestSerializer.deserializeObject(obj);
+                return JWebRequestSerializer.fromJson(obj);
 	}
 
 	public synchronized String registerObject(JBaseWin zBaseWin) throws Exception {
@@ -804,12 +804,12 @@ public JWebRequestPackage deserializeRegisterJSON(String serializedDictionary) {
 	return JWebRequestSerializer.deserializeRegisterJSON(serializedDictionary);
 }
 
-public static String serializeObject(Serializable obj) throws IOException {
-	return JWebRequestSerializer.serializeObject(obj);
+public static String toJson(Serializable obj) throws IOException {
+        return JWebRequestSerializer.toJson(obj);
 }
 
-public static Serializable deserializeObject(String serializedObj)  {
-	return JWebRequestSerializer.deserializeObject(serializedObj);
+public static Serializable fromJson(String serializedObj)  {
+        return JWebRequestSerializer.fromJson(serializedObj);
 }
 
 public static String baseWinToSession(JBaseWin zOwner) throws Exception {
