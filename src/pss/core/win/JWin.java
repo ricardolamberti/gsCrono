@@ -38,6 +38,13 @@ import pss.core.winUI.icons.GuiIconos;
 import pss.www.platform.actions.requestBundle.JWebActionData;
 import pss.www.platform.actions.requestBundle.JWebActionDataField;
 
+/**
+ * Clase base para todas las ventanas del framework. Proporciona la lógica
+ * común para trabajar con {@link JRecord} y coordinar los formularios
+ * derivados de {@link JBaseForm}. Las ventanas concretas extienden esta clase
+ * para implementar comportamientos específicos de cada módulo de la
+ * aplicación.
+ */
 public abstract class JWin extends JBaseWin {
 
 	private transient Class<? extends JBaseForm> oWFormBase;
@@ -480,12 +487,12 @@ public abstract class JWin extends JBaseWin {
 		action.setMulti(true);
 		action.setHelp("Permite eliminar "+GetTitle());
 		action.setConfirmMessage(true);
-		action.setConfirmMessageDescription("�Est� seguro que desea borrar el registro?");
+		action.setConfirmMessageDescription("¿Está seguro que desea borrar el registro?");
 		return action;
 	}
 
 	protected BizAction addActionUpdate(int zId, String zDesc) throws Exception {
-		return this.addAction(zId, zDesc, this.getKeyUpdateMask(), null, GuiIcon.MODIFICAR_ICON, true, true, false).setHelp("Permite abrir el formulario de modificaci�n de "+GetTitle());
+		return this.addAction(zId, zDesc, this.getKeyUpdateMask(), null, GuiIcon.MODIFICAR_ICON, true, true, false).setHelp("Permite abrir el formulario de modificación de "+GetTitle());
 	}
 
 	protected BizAction addActionNewSubmit(int zId, String descr) throws Exception {
@@ -878,7 +885,7 @@ public abstract class JWin extends JBaseWin {
 	}
 
 	public BizAction createActionUpdate() throws Exception {
-		return this.addActionUpdate(JWin.ACTION_UPDATE, "Modificar").setHelp("Permite abrir el formulario de modificaci�n de "+GetTitle());
+		return this.addActionUpdate(JWin.ACTION_UPDATE, "Modificar").setHelp("Permite abrir el formulario de modificación de "+GetTitle());
 	}
 
 	public BizAction createActionDelete() throws Exception {

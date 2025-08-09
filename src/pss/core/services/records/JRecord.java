@@ -57,6 +57,11 @@ import pss.core.winUI.controls.JControlCombo;
 import pss.core.winUI.controls.JControlTree;
 import pss.core.winUI.controls.JFormRow;
 
+/**
+ * Representa un registro de datos con sus propiedades y comportamiento
+ * persistente. Gestiona campos, relaciones y operaciones de clonación o
+ * actualización sobre la fuente de datos.
+ */
 public class JRecord extends JBaseRecord implements Comparable<Object>,JPurgeInterface {
 
 	private static JMap<String, JMap<String, JProperty>> aPropClass;
@@ -2147,7 +2152,7 @@ public class JRecord extends JBaseRecord implements Comparable<Object>,JPurgeInt
 	}
 
 	public String getDateFieldForPurge() throws Exception {
-		JExcepcion.SendError("Debe configurar campo fecha para depuraci�n");
+		JExcepcion.SendError("Debe configurar campo fecha para depuraciï¿½n");
 		return null;
 	}
 

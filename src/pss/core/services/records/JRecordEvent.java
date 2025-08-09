@@ -1,7 +1,10 @@
 package pss.core.services.records;
 
-
-
+/**
+ * Evento producido durante operaciones de un {@link JRecord}. Permite
+ * notificar acciones como altas, actualizaciones o eliminaciones sobre los
+ * registros.
+ */
 public class JRecordEvent {
 
   String   Id;
