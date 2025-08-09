@@ -48,33 +48,28 @@ public class JWebRequest {
 	private Map<String, String> oRegisteredObjectsOld;
 	private JWebHistoryManager oHistoryManager;
 
-	public class JWebRequestPackage {
-		private Map<String, String> localRegisteredObject;
-		private JLocalHistoryManager localHistoryManager;
 
-//		@Override
-//	  public String toString() {
-//	    try {
-//				return  getRegisterObjectsSerialized();
-//			} catch (Exception e) {
-//				e.printStackTrace();
-//				return "error";
-//			}
-//	  }
 
-		public String getRegisterObjectsSerialized() throws Exception {
-			localRegisteredObject = oRegisteredObjectsNew;
-			localHistoryManager = getHistoryManager().serializeHistoryManager();
-			return JWebRequestSerializer.serializeRegisterJSON(this);
-		}
-	}
+       public static class JWebRequestPackage {
+               private Map<String, String> localRegisteredObject;
+               private JLocalHistoryManager localHistoryManager;
 
-	
-	JWebRequestPackage pack = new JWebRequestPackage();
-	
-	public JWebRequestPackage getPack() {
-		return pack;
-	}
+               public JWebRequestPackage(Map<String, String> localRegisteredObject,
+                               JLocalHistoryManager localHistoryManager) {
+                       this.localRegisteredObject = localRegisteredObject;
+                       this.localHistoryManager = localHistoryManager;
+               }
+
+               public String getRegisterObjectsSerialized() throws Exception {
+                       return JWebRequestSerializer.serializeRegisterJSON(this);
+               }
+       }
+
+
+       public JWebRequestPackage getPack() throws Exception {
+               return new JWebRequestPackage(oRegisteredObjectsNew,
+                               getHistoryManager().serializeHistoryManager());
+       }
 	
 
 
