@@ -44,6 +44,9 @@ JWebActionResult → componentes UI (`JWebView`, `JWebWinForm`, ...)
 
 - `JWebRequest`: encapsula los datos de la solicitud HTTP, maneja la sesión y coordina el procesamiento.
 - `JDoPssActionResolver`: resuelve y ejecuta acciones de negocio dentro del flujo web.
+- `ActionResolverStrategy` y resolvers concretos (`RedirectActionResolver`, `SubmitActionResolver`, ...):
+  implementan un patrón *strategy* que decide cómo procesar cada `JAct` (redirección,
+  navegación hacia atrás, envío, etc.).
 - `JWebActionRequestProcessor`: interfaz que inicializa el contexto de aplicación y crea `JWebRequest`.
 - `JWebApplication` / `JWebApplicationSession`: representan la aplicación y la sesión del usuario.
 - `JWebView`, `JWebWinForm` y demás componentes en `ui` construyen la respuesta HTML.

@@ -4,6 +4,10 @@ import pss.core.win.submits.JAct;
 import pss.core.win.submits.JActFileGenerate;
 import pss.www.platform.actions.results.JWebActionResult;
 
+/**
+ * Handles {@link JAct} instances that generate files, producing a redirect
+ * response so the file can be downloaded by the client.
+ */
 public class RedirectActionResolver implements ActionResolverStrategy {
     @Override
     public boolean supports(JDoPssActionResolver context, JAct submit) throws Exception {
