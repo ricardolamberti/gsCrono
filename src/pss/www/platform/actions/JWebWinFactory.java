@@ -897,6 +897,7 @@ public class JWebWinFactory {
 			return win;
 		JBaseWin actionOwner = getOrCreateWin(serializableWin.cls, sUniqueId);
 		actionOwner.setUniqueID(sUniqueId);
+		if (serializableWin.dropControl != null) 
 			actionOwner.setDropControlIdListener((JAct) JWebRequestSerializer.deserializeObject(JTools.byteVectorToString(Base64.getDecoder().decode(serializableWin.dropControl))));
 		actionOwner.SetVision(serializableWin.vision);
 		if (actionOwner.isWin()) {

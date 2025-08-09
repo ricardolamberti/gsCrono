@@ -9,15 +9,12 @@ package pss.www.platform.actions;
 import java.io.IOException;
 import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 
 import org.apache.cocoon.environment.Request;
-
 
 import pss.core.services.records.JBaseRecord;
 import pss.core.tools.JTools;
