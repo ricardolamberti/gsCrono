@@ -142,32 +142,46 @@ public class JDoPssActionResolver extends JIndoorsActionResolver implements ICon
 	}
 	protected JWebActionResult performAction(JAct submit) throws Throwable {
 
-//		boolean alreadyStore=false;
-		// layout print
-		if (this.isRedirectable(submit)) {
-			return this.processRedirect(submit);
-		}
-		if (this.isLink(submit)) {
-			return this.processRedirectLink(submit);
-		}
-		if (this.isBack(submit)) {
-			submit = this.getBackAct((JActBack)submit );
-		}
-//		if (this.isFindBack(submit)) {
-//			submit = this.getFindBackAct(submit);
-//		}
-		
-		if (this.hasToSubmit(submit)) {
-			// altas y modificaciones
-			return this.processSubmit(submit);
-		}
- 
-		// Queries, refresh, form LOV
-		this.assignTarget(submit);
+                if (this.isRedirectable(submit)) {
+                        return handleRedirect(submit);
+                }
+                if (this.isLink(submit)) {
+                        return handleLink(submit);
+                }
+                if (this.isBack(submit)) {
+                        return handleBack((JActBack) submit);
+                }
+                if (this.hasToSubmit(submit)) {
+                        return handleSubmit(submit);
+                }
+                return handleQuery(submit);
+        }
 
-		return this.goOn();
+        private JWebActionResult handleRedirect(JAct submit) throws Throwable {
+                return this.processRedirect(submit);
+        }
 
-	}
+        private JWebActionResult handleLink(JAct submit) throws Throwable {
+                return this.processRedirectLink(submit);
+        }
+
+        private JWebActionResult handleBack(JActBack back) throws Throwable {
+                JAct submit = this.getBackAct(back);
+                if (this.hasToSubmit(submit)) {
+                        return handleSubmit(submit);
+                }
+                return handleQuery(submit);
+        }
+
+        private JWebActionResult handleSubmit(JAct submit) throws Throwable {
+                return this.processSubmit(submit);
+        }
+
+        private JWebActionResult handleQuery(JAct submit) throws Exception {
+                this.assignTarget(submit);
+                return this.goOn();
+        }
+
 
 	protected boolean isBackPageOnDelete() {
 		return false;
@@ -466,7 +480,7 @@ public class JDoPssActionResolver extends JIndoorsActionResolver implements ICon
 	protected JBaseWin verifyMultipleAction(JBaseWin baseWin) throws Exception {
 		if (!this.getRequest().hasMultipleObjectOwnerList() ) return baseWin;
 		if (baseWin instanceof JWin) 
-			JExcepcion.SendError("Función no habilida para selección multiple");
+			JExcepcion.SendError("FunciÃ³n no habilida para selecciÃ³n multiple");
 		JWins newWin=(JWins) baseWin.getClass().newInstance();
 		JHistoryProvider hp =this.findHistoryProvider();
 		if (hp==null)

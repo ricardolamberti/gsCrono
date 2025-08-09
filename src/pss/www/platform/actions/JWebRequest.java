@@ -6,26 +6,18 @@
 
 package pss.www.platform.actions;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
-import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
 
 import org.apache.cocoon.environment.Request;
 
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 
 import pss.core.services.records.JBaseRecord;
 import pss.core.tools.JTools;
@@ -76,7 +68,7 @@ public class JWebRequest {
 		public String getRegisterObjectsSerialized() throws Exception {
 			localRegisteredObject = oRegisteredObjectsNew;
 			localHistoryManager = getHistoryManager().serializeHistoryManager();
-			return serializeRegisterJSON(this);
+			return JWebRequestSerializer.serializeRegisterJSON(this);
 		}
 	}
 
@@ -655,7 +647,7 @@ public class JWebRequest {
 
 
 	public synchronized String registerObject(String pos, JBaseWin zBaseWin) throws Exception {
-		this.getRegisteredObjectsNew().put(pos, baseWinToSession(zBaseWin));
+		this.getRegisteredObjectsNew().put(pos, JWebRequestSerializer.baseWinToSession(zBaseWin));
 		return pos;
 	}
 
@@ -670,7 +662,7 @@ public class JWebRequest {
 	public synchronized String registerObjectObj(Serializable zObject, boolean temp) throws Exception {
 		if (temp && zObject instanceof JBaseWin) return registerWinObjectObj((JBaseWin)zObject);
 		String id = "obj_p_" + zObject.hashCode();// +
-		this.getRegisteredObjectsNew().put(id, serializeObject(zObject));
+		this.getRegisteredObjectsNew().put(id, JWebRequestSerializer.serializeObject(zObject));
 		return id;
 	}
 	Map <String,String> objectsCreated = new HashMap<String, String>();
@@ -702,7 +694,7 @@ public class JWebRequest {
 			}
 //		}
 //	PssLogger.logDebug("THREAD ------------------------------> getRegisterObject "+getOldIdDictionary()+"("+key+"): "+(obj==null?"NO ENCONTRADO":"OK"));
-		return deserializeObject(obj);
+		return JWebRequestSerializer.deserializeObject(obj);
 	}
 
 	public synchronized String registerObject(JBaseWin zBaseWin) throws Exception {
@@ -779,7 +771,7 @@ public class JWebRequest {
 			String dictionary = getPssIdDictionary();
 			if (dictionary == null || dictionary.isEmpty())
 				return;
-			pack = (JWebRequestPackage) deserializeRegisterJSON(dictionary);
+			pack = (JWebRequestPackage) JWebRequestSerializer.deserializeRegisterJSON(dictionary);
 			if (getHistoryManager().sizeHistory()==0) {
 				getHistoryManager().deserializeHistoryManager(pack.localHistoryManager);
 				factory.fillHistory();
@@ -797,67 +789,33 @@ public class JWebRequest {
 	}
 
 	public String serializeRegisterMapJSON(Map<String,String> pack) {
-		Gson gson = new Gson();
-		String serializedMap = gson.toJson(pack);
-		return Base64.getEncoder().encodeToString(JTools.stringToByteArray(serializedMap));
-	}
-	
-	public Map<String,String> deserializeRegisterMapJSON(String serializedDictionary) {
-		Map<String,String> map = new TreeMap<String,String>();
-		Gson gson = new Gson();
-		Type type = new TypeToken<Map<String,String>>() {}.getType();
-  	map = gson.fromJson(JTools.byteVectorToString(Base64.getDecoder().decode(serializedDictionary)), type);
-		return map;
-	}
-	
-	public String serializeRegisterJSON(JWebRequestPackage pack) {
-		Gson gson = new Gson();
-		String serializedMap = gson.toJson(pack);
-		return Base64.getEncoder().encodeToString(JTools.stringToByteArray(serializedMap));
-	}
-	
-	public JWebRequestPackage deserializeRegisterJSON(String serializedDictionary) {
-		JWebRequestPackage map = new JWebRequestPackage();
-		Gson gson = new Gson();
-		Type type = new TypeToken<JWebRequestPackage>() {}.getType();
-  	map = gson.fromJson(JTools.byteVectorToString(Base64.getDecoder().decode(serializedDictionary)), type);
-		return map;
-	}
-	
-	public static String serializeObject(Serializable obj) throws IOException {
-		ByteArrayOutputStream baos = new ByteArrayOutputStream();
-		ObjectOutputStream oos = new ObjectOutputStream(baos);
-		oos.writeObject(obj);
-		oos.close();
-		return Base64.getEncoder().encodeToString(baos.toByteArray());
-	}
+	return JWebRequestSerializer.serializeRegisterMapJSON(pack);
+}
 
-	public static Serializable deserializeObject(String serializedObj)  {
-		try {
-			if (serializedObj==null) return null;
-			byte[] data = Base64.getDecoder().decode(serializedObj);
-			ObjectInputStream ois = new ObjectInputStream(new ByteArrayInputStream(data));
-			Serializable obj = (Serializable) ois.readObject();
-			ois.close();
-			return obj;
-		} catch (ClassNotFoundException e) {
-			PssLogger.logError(e);
-			e.printStackTrace();
-		} catch (IOException e) {
-			PssLogger.logError(e);
-		}
-		return null;
-	}
+public Map<String,String> deserializeRegisterMapJSON(String serializedDictionary) {
+	return JWebRequestSerializer.deserializeRegisterMapJSON(serializedDictionary);
+}
 
-	public static String baseWinToSession(JBaseWin zOwner) throws Exception {
-//	  if (!zOwner.canConvertToURL()) return serializeObject(zOwner);
-//		if (zOwner.hasDropListener()) return serializeObject(zOwner);
-//		if (zOwner.hasSubmitListener()) return serializeObject(zOwner);
-//		if (zOwner.isModeWinLov()) return serializeObject(zOwner);
-//		if (!zOwner.isReaded()) return serializeObject(zOwner);
+public String serializeRegisterJSON(JWebRequestPackage pack) {
+	return JWebRequestSerializer.serializeRegisterJSON(pack);
+}
 
-		return serializeObject(new JWebWinFactory(null).baseWinToJSON(zOwner));
-	}
+public JWebRequestPackage deserializeRegisterJSON(String serializedDictionary) {
+	return JWebRequestSerializer.deserializeRegisterJSON(serializedDictionary);
+}
+
+public static String serializeObject(Serializable obj) throws IOException {
+	return JWebRequestSerializer.serializeObject(obj);
+}
+
+public static Serializable deserializeObject(String serializedObj)  {
+	return JWebRequestSerializer.deserializeObject(serializedObj);
+}
+
+public static String baseWinToSession(JBaseWin zOwner) throws Exception {
+	return JWebRequestSerializer.baseWinToSession(zOwner);
+}
+
 	
 
 
