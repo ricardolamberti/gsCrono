@@ -406,7 +406,16 @@ public abstract class JAct implements Cloneable, Serializable {
 	public void execSubmit() throws Exception {}
 
   public void setResult(JBaseWin zValue) {
-  	this.result=zValue;
+        this.result=zValue;
+  }
+
+  /**
+   * Returns the result window if it was explicitly set without triggering
+   * generation of a default one. This helper is useful when reconstructing
+   * actions from serialized data.
+   */
+  public JBaseWin getResultDirect() {
+    return this.result;
   }
 	public void setActionSource(BizAction value) throws Exception {
 		this.actionSource=value;
