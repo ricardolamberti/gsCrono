@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.StringTokenizer;
+import java.util.Arrays;
 
 import pss.common.security.BizUsuario;
 import pss.core.services.fields.JObject;
@@ -52,9 +53,15 @@ import pss.www.platform.users.history.BizUserHistory;
 
 public class JDoPssActionResolver extends JIndoorsActionResolver implements IControlToBD {
 
-	boolean resetRegisteredObjects=true;
-	boolean bNoSubmit=false;
-	boolean bBack=false;
+        boolean resetRegisteredObjects=true;
+        boolean bNoSubmit=false;
+       boolean bBack=false;
+       private final List<ActionResolverStrategy> actionResolvers = Arrays.asList(
+                       new RedirectActionResolver(),
+                       new LinkActionResolver(),
+                       new BackActionResolver(),
+                       new SubmitActionResolver(),
+                       new QueryActionResolver());
 
 
 	public boolean resetOldObjects() throws Exception {
@@ -142,52 +149,20 @@ public class JDoPssActionResolver extends JIndoorsActionResolver implements ICon
 	}
 	protected JWebActionResult performAction(JAct submit) throws Throwable {
 
-                if (this.isRedirectable(submit)) {
-                        return handleRedirect(submit);
-                }
-                if (this.isLink(submit)) {
-                        return handleLink(submit);
-                }
-                if (this.isBack(submit)) {
-                        return handleBack((JActBack) submit);
-                }
-                if (this.hasToSubmit(submit)) {
-                        return handleSubmit(submit);
-                }
-                return handleQuery(submit);
-        }
-
-        private JWebActionResult handleRedirect(JAct submit) throws Throwable {
-                return this.processRedirect(submit);
-        }
-
-        private JWebActionResult handleLink(JAct submit) throws Throwable {
-                return this.processRedirectLink(submit);
-        }
-
-        private JWebActionResult handleBack(JActBack back) throws Throwable {
-                JAct submit = this.getBackAct(back);
-                if (this.hasToSubmit(submit)) {
-                        return handleSubmit(submit);
-                }
-                return handleQuery(submit);
-        }
-
-        private JWebActionResult handleSubmit(JAct submit) throws Throwable {
-                return this.processSubmit(submit);
-        }
-
-        private JWebActionResult handleQuery(JAct submit) throws Exception {
-                this.assignTarget(submit);
-                return this.goOn();
-        }
+               for (ActionResolverStrategy strategy : actionResolvers) {
+                       if (strategy.supports(this, submit)) {
+                               return strategy.handle(this, submit);
+                       }
+               }
+               return this.goOn();
+       }
 
 
 	protected boolean isBackPageOnDelete() {
 		return false;
 	}
 
-	private boolean hasToSubmit(JAct action) throws Exception {
+       protected boolean hasToSubmit(JAct action) throws Exception {
 		if (!this.isNewRecordEnabled()) return false;
 		if (action.isOnlySubmit()) return true;
 		if (action.isQueryAction()) return false;
@@ -247,7 +222,7 @@ public class JDoPssActionResolver extends JIndoorsActionResolver implements ICon
 		return submit;
 	}
 	
-	private JAct getBackAct(JActBack submit) throws Exception {
+       protected JAct getBackAct(JActBack submit) throws Exception {
 		int step = submit.getBackStep();
 		JHistory target=this.getSession().getHistoryManager().backOneHistory();
 		if (step==2)
@@ -265,7 +240,7 @@ public class JDoPssActionResolver extends JIndoorsActionResolver implements ICon
 		return act;
 	}
 
-	private JWebActionResult processSubmit(JAct action) throws Throwable {
+       protected JWebActionResult processSubmit(JAct action) throws Throwable {
 //		JAct nextAction=action.doSubmit(true);
 //
 //		if (nextAction!=null) {
@@ -345,23 +320,8 @@ public class JDoPssActionResolver extends JIndoorsActionResolver implements ICon
 		return (submit  instanceof JActDrop);
 	}
 	
-	private boolean isBack(JAct submit) throws Exception {
-		return (submit.getClass().isAssignableFrom(JActBack.class));
-	}
 
-//	private boolean isFindBack(JAct submit) throws Exception {
-//		return (submit  instanceof JActFindBack);
-//	}
-
-	private boolean isLink(JAct submit) throws Exception {
-		return (submit instanceof JActExternalLink);
-	}
-
-	private boolean isRedirectable(JAct submit) throws Exception {
-		return (submit.getFinalSubmit() instanceof JActFileGenerate);
-	}
-
-	private JWebActionResult processRedirectLink(JAct submit) throws Throwable {
+       protected JWebActionResult processRedirectLink(JAct submit) throws Throwable {
 		JActExternalLink action=(JActExternalLink) submit;
 		this.setResetRegisteredObjects(false);
 		action.doSubmit(true);
@@ -380,7 +340,7 @@ public class JDoPssActionResolver extends JIndoorsActionResolver implements ICon
 		} 
 	}
 	
-	private JWebActionResult processRedirect(JAct submit) throws Throwable {
+       protected JWebActionResult processRedirect(JAct submit) throws Throwable {
 		JActFileGenerate action=(JActFileGenerate) submit.getFinalSubmit();
 		// action.setFileName("file["+this.getSession().getId().replace(':', '-')+"]");
 		this.setResetRegisteredObjects(false);
