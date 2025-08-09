@@ -158,13 +158,13 @@ public abstract class JBasicWebActionResolver extends AbstractAction implements 
 			this.processAction();
 
 			Map<String, Object> oFinalResultMap=this.getFinalResultMap();
-			this.cleanUp();
 			return oFinalResultMap;
 
 		} catch (Throwable e) {
-			this.cleanUp();
-		  PssLogger.logError(e);
+			PssLogger.logError(e);
 			throw new ProcessingException("Uncaught error while processing action '"+this.getActionName()+"'", e);
+		} finally {
+			this.cleanUp();
 		}
 	}
 

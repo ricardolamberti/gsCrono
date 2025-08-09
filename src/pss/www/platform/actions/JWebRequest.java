@@ -310,8 +310,11 @@ public class JWebRequest {
 //
 	public synchronized void detachFromRunningThread() throws Exception {
 //		this.setSession(null);
-		JWebApplicationSession.detachGlobals();
-		JWebActionFactory.CURRENT_REQUEST.set(null);
+		try {
+			JWebApplicationSession.detachGlobals();
+		} finally {
+			JWebActionFactory.CURRENT_REQUEST.remove();
+		}
 //		conex--;
 //		PssLogger.logInfo("---------------------------------------------------------------------> conexiones close: "+conex);
 
