@@ -5,7 +5,14 @@ import pss.core.win.JBaseWin;
 import pss.core.win.JControlWin;
 import pss.core.win.JWins;
 
-
+/**
+ * Action that opens a list of records inside a {@link JWins} container.
+ * <p>
+ * It supports multi selection as well as single line selection depending on
+ * the configuration passed to the constructor. The resulting window can be used
+ * to select elements or simply browse information.
+ * </p>
+ */
 public class JActWins extends JAct {
 	
 	private boolean bMultiple=true;

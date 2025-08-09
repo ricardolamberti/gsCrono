@@ -19,10 +19,13 @@ import pss.core.win.actions.BizAction;
 import pss.core.winUI.forms.JBaseForm;
 
 /**
- * 
- * <b>JAct</b>
- * <p>Representación de una accion</p>
- * <p>Contiene el Win al que se le aplica la accion (owner), la accion a aplicar (actionId) y el Win resultante (result)</p>
+ * Base class for all executable actions in the UI framework.
+ * <p>
+ * A {@code JAct} ties together the originating window, the identifier of the
+ * action to perform and the resulting window or form. Subclasses implement the
+ * specific behavior (query, modification, navigation, etc.) that should happen
+ * when the action is triggered.
+ * </p>
  */
 public abstract class JAct implements Cloneable, Serializable {
 
@@ -452,7 +455,7 @@ public abstract class JAct implements Cloneable, Serializable {
 				
   protected JAct getSubmitById() throws Exception {
   	BizAction a = this.getWinResult().findActionByUniqueId(this.getActionUniqueId(), false, false); // fuerzo el ok action
-  	if (a==null) JExcepcion.SendError("No Existe acción: " + this.getActionUniqueId());
+  	if (a==null) JExcepcion.SendError("No Existe acciÃ³n: " + this.getActionUniqueId());
   	a.setModal(getActionSource().isModal());
   	return a.getSubmit();
 	}

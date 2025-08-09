@@ -5,6 +5,13 @@ import pss.core.win.JBaseWin;
 import pss.core.win.JWin;
 import pss.core.winUI.forms.JBaseForm;
 
+/**
+ * Action that updates an existing record.
+ * <p>
+ * It generates an update form for the target window and performs the
+ * persistence logic when submitted.
+ * </p>
+ */
 public class JActUpdate extends JActModify {
 	
 //	private JBaseForm form;

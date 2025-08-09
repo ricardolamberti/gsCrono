@@ -4,6 +4,14 @@ import pss.core.tools.JExceptionOnlyMessage;
 import pss.core.win.JBaseWin;
 import pss.core.winUI.forms.JBaseForm;
 
+/**
+ * Base class for actions that modify the underlying record.
+ * <p>
+ * Provides helper methods to obtain either a new form or an update form and to
+ * notify controls about changes triggered by the user. Concrete subclasses
+ * implement the specific behaviour for insert, update or delete operations.
+ * </p>
+ */
 public abstract class JActModify extends JAct {
 
 
