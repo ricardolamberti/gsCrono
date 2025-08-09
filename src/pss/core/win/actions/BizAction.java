@@ -538,16 +538,28 @@ public class BizAction extends JRecord {
 		sOwner = zValue;
 	}
 
-	public BizAction() throws Exception {
-	}
+        public BizAction() throws Exception {
+        }
 
-	public void setObjOwner(JBaseWin zValue) {
-		owner = zValue;
-	}
+        public void setObjOwner(JBaseWin zValue) {
+                owner = zValue;
+        }
 
-	public JBaseWin getObjOwner() {
-		return owner;
-	}
+        public JBaseWin getObjOwner() {
+                return owner;
+        }
+
+        /**
+         * Indicates whether this action requires full object serialization when
+         * being transferred between client and server. Subclasses may override
+         * this method to opt-out of the compact transfer path.
+         *
+         * @return {@code true} if the full action must be serialized, {@code false}
+         *         otherwise.
+         */
+        public boolean needsFullSerialization() {
+                return false;
+        }
 
 	public JWin getObjWinOwner() {
 		return (JWin)owner;
