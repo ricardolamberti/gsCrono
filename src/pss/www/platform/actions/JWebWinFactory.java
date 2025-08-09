@@ -24,7 +24,6 @@ import pss.core.services.records.JBaseRecord;
 import pss.core.services.records.JRecord;
 import pss.core.services.records.JRecords;
 import pss.core.tools.JTools;
-import pss.www.platform.actions.JWebRequestSerializer;
 import pss.core.tools.collections.JCollectionFactory;
 import pss.core.tools.collections.JIterator;
 import pss.core.tools.collections.JList;
@@ -308,7 +307,7 @@ public class JWebWinFactory {
 //
 //			}
 //			if (zWinBundle.get("dropControl")!=null) {
-//				actionOwner.setDropControlIdListener((JAct)JWebRequestSerializer.deserializeObject( JTools.byteVectorToString(Base64.getDecoder().decode(zWinBundle.get("dropControl")))));
+//				actionOwner.setDropControlIdListener((JAct)JWebActionFactory.getCurrentRequest().deserializeObject( JTools.byteVectorToString(Base64.getDecoder().decode(zWinBundle.get("dropControl")))));
 //			}
 //		} catch (Exception e) {
 //			PssLogger.logError(e);
@@ -777,7 +776,7 @@ public class JWebWinFactory {
 		Map<String, String> dict = new HashMap<String, String>();
 		dict.put("actionid", zAction.getIdAction());
 //		if (zAction.getIdAction().indexOf("anonimus_")!=-1) {
-                dict.put("action", Base64.getEncoder().encodeToString(JTools.stringToByteVector(JWebRequestSerializer.toJson(zAction))));
+		dict.put("action", Base64.getEncoder().encodeToString(JTools.stringToByteVector(JWebActionFactory.getCurrentRequest().serializeObject(zAction))));
 //		} else {
 //			dict.put("owner", Base64.getEncoder().encodeToString(JTools.stringToByteVector( baseWinToURL(zAction.getObjOwner()))));
 //			if (zAction.hasSubmit() ) {
@@ -794,7 +793,7 @@ public class JWebWinFactory {
 		Map<String, String> dict = JWebActionFactory.getCurrentRequest().deserializeRegisterMapJSON(sAction);
 		BizAction action;
 		if (dict.containsKey("action")) {
-                        action = (BizAction) JWebRequestSerializer.fromJson(JTools.byteVectorToString(Base64.getDecoder().decode(dict.get("action"))));
+			action = (BizAction) JWebActionFactory.getCurrentRequest().deserializeObject(JTools.byteVectorToString(Base64.getDecoder().decode(dict.get("action"))));
 		} else {
 			JBaseWin win = getRegisterObjectTemp(dict.get("owner"));
 			action = win.findActionByUniqueId(dict.get("actionid"));
@@ -821,7 +820,7 @@ public class JWebWinFactory {
 //			oData.add("drop", Base64.getEncoder().encodeToString(JTools.stringToByteArray(baseWinToJSON(zOwner.getDropListener()))));
 //		}
 //		if (zOwner.hasDropControlIdListener()) {
-//			oData.add("dropControl", Base64.getEncoder().encodeToString(JTools.stringToByteArray(JWebRequestSerializer.serializeObject(zOwner.getDropControlIdListener()))));
+//			oData.add("dropControl", Base64.getEncoder().encodeToString(JTools.stringToByteArray(JWebActionFactory.getCurrentRequest().serializeObject(zOwner.getDropControlIdListener()))));
 //
 //		}
 //		if (zOwner.isWin() && zOwner.GetBaseDato().getFilters().isEmpty())
@@ -878,7 +877,7 @@ public class JWebWinFactory {
 		return Base64.getEncoder().encodeToString(json.getBytes(StandardCharsets.UTF_8));
 	}
 
-	// M√©todo para deserializar desde JSON (como JAct u otros objetos)
+	// MÈtodo para deserializar desde JSON (como JAct u otros objetos)
 	public Object deserializeObject(String json, Class<?> clazz) throws IOException {
 		return objectMapper.readValue(json, clazz);
 	}
@@ -897,14 +896,13 @@ public class JWebWinFactory {
 			return win;
 		JBaseWin actionOwner = getOrCreateWin(serializableWin.cls, sUniqueId);
 		actionOwner.setUniqueID(sUniqueId);
-                if (serializableWin.dropControl != null)
-                        actionOwner.setDropControlIdListener((JAct) JWebRequestSerializer.fromJson(JTools.byteVectorToString(Base64.getDecoder().decode(serializableWin.dropControl))));
+		// Asignar propiedades b·sicas
 		actionOwner.SetVision(serializableWin.vision);
 		if (actionOwner.isWin()) {
 			((JWin) actionOwner).getRecord().setDatosLeidos(serializableWin.readed);
 		}
 
-		// Asignar filtros y propiedades usando los m√©todos adaptados
+		// Asignar filtros y propiedades usando los mÈtodos adaptados
 		assignFilters(serializableWin, actionOwner.GetBaseDato());
 		assignProps(serializableWin, actionOwner.GetBaseDato());
 
@@ -918,9 +916,9 @@ public class JWebWinFactory {
 			actionOwner.setDropListener(this.getBaseWinFromBundle((String) JTools.byteVectorToString(Base64.getDecoder().decode(serializableWin.drop))));
 
 		}
-                if (serializableWin.dropControl != null) {
-                        actionOwner.setDropControlIdListener((JAct) JWebActionFactory.getCurrentRequest().fromJson(JTools.byteVectorToString(Base64.getDecoder().decode(serializableWin.dropControl))));
-                }
+		if (serializableWin.dropControl != null) {
+			actionOwner.setDropControlIdListener((JAct) JWebActionFactory.getCurrentRequest().deserializeObject(JTools.byteVectorToString(Base64.getDecoder().decode(serializableWin.dropControl))));
+		}
 
 		return actionOwner;
 	}
@@ -936,7 +934,7 @@ public class JWebWinFactory {
 		String sUniqueId = id != null ? id : serializableWin.uniqueId;
 		JBaseRecord actionOwner = getOrCreateRec(serializableWin.cls, sUniqueId);
 
-		// Asignar propiedades b√°sicas
+		// Asignar propiedades b·sicas
 		actionOwner.SetVision(serializableWin.vision);
 		if (actionOwner instanceof JRecord) {
 			((JRecord) actionOwner).setDatosLeidos(serializableWin.readed);
@@ -945,7 +943,7 @@ public class JWebWinFactory {
 			((JRecords) actionOwner).setRecordRef(serializableWin.recordClass);
 		}
 
-		// Asignar filtros y propiedades usando los m√©todos adaptados
+		// Asignar filtros y propiedades usando los mÈtodos adaptados
 		assignFilters(serializableWin, actionOwner);
 		assignProps(serializableWin, actionOwner);
 		asaignElements(serializableWin, actionOwner);
@@ -1018,7 +1016,7 @@ public class JWebWinFactory {
 					String serializedData = propValue;
 					byte[] decodedBytes = Base64.getDecoder().decode(serializedData);
 					String jsonString = JTools.byteVectorToString(decodedBytes);
-                                        Serializable obj = (Serializable) JWebRequestSerializer.fromJson(jsonString);
+					Serializable obj = (Serializable) JWebActionFactory.getCurrentRequest().deserializeObject(jsonString);
 
 					field.set(actionOwner, obj); 
 				} catch (NoSuchFieldException | IllegalAccessException | ClassCastException e) {
@@ -1089,9 +1087,9 @@ public class JWebWinFactory {
 		if (win.hasDropListener()) {
 			serializableWin.drop = Base64.getEncoder().encodeToString(JTools.stringToByteArray(baseWinToJSON(win.getDropListener())));
 		}
-                if (win.hasDropControlIdListener()) {
-                        serializableWin.dropControl = Base64.getEncoder().encodeToString(JTools.stringToByteArray(JWebRequestSerializer.toJson(win.getDropControlIdListener())));
-                }
+		if (win.hasDropControlIdListener()) {
+			serializableWin.dropControl = Base64.getEncoder().encodeToString(JTools.stringToByteArray(JWebActionFactory.getCurrentRequest().serializeObject(win.getDropControlIdListener())));
+		}
 		return serializableWin;
 	}
 
@@ -1142,7 +1140,7 @@ public class JWebWinFactory {
 			}
 		}
 		if (!onlyProperties) {
-			Class<?> currentClass = rec.getClass(); // Clase espec√≠fica de rec
+			Class<?> currentClass = rec.getClass(); // Clase especÌfica de rec
 			Field[] fields = currentClass.getDeclaredFields(); // Obtener los campos declarados
 
 			for (Field field : fields) {
@@ -1169,9 +1167,9 @@ public class JWebWinFactory {
 					serializableWin.properties.put("SRECS_" + fieldName, serialized);
 				} else if (fieldValue instanceof String || fieldValue.getClass().isPrimitive()) {
 					serializableWin.properties.put("OTH_" + fieldName, fieldValue.toString());
-                                } else if (fieldValue instanceof Serializable) {
-                                        Serializable serObj = (Serializable) fieldValue;
-                                        serializableWin.properties.put("SER_" + fieldName, Base64.getEncoder().encodeToString(JTools.stringToByteArray(JWebRequestSerializer.toJson(serObj))));
+				} else if (fieldValue instanceof Serializable) {
+					Serializable serObj = (Serializable) fieldValue;
+					serializableWin.properties.put("SER_" + fieldName, Base64.getEncoder().encodeToString(JTools.stringToByteArray(JWebActionFactory.getCurrentRequest().serializeObject(serObj))));
 				} else if (fieldValue instanceof Serializable) {
 					serializableWin.properties.put("OTH_" + fieldName, fieldValue.toString());
 				}
