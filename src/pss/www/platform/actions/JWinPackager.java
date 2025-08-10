@@ -417,7 +417,7 @@ public class JWinPackager {
     }
 
     private JSerializableBaseWin prepareSerializableWin(JBaseWin win) throws Exception {
-        JSerializableBaseWin serializableWin = prepareSerializableRec(win.GetBaseDato(), win.canConvertToURL());
+			JSerializableBaseWin serializableWin = prepareSerializableRec(win.GetBaseDato(), win.canConvertToURL());
         serializableWin.cls = win.getClass().getName();
 
         if (win.hasDropListener()) {

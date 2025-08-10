@@ -122,18 +122,12 @@ public class JWebWinFactory {
 		return;
 	}
 
-//	public JBaseWin getBaseWinFromBundle(JWebActionData zWinBundle) throws Exception {
-//		return getBaseWinFromBundle(zWinBundle, true, null);
-//	}
-
 	public JBaseWin getBaseWinFromBundle(String zWinBundle) throws Exception {
 		return getBaseWinFromBundle(zWinBundle, true, null);
 	}
 
 	public JBaseWin getBaseWinFromBundle(String zWinBundle, boolean loadData, String id) throws Exception {
 		JBaseWin actionOwner = getPackager().createWin(zWinBundle, id);
-//		this.asignFilters(zWinBundle, actionOwner);
-//		this.asignProps(zWinBundle, actionOwner);
 		if (loadData)
 			this.loadData(actionOwner, true, JWebActionFactory.getCurrentRequest().hasTableProvider() ? JWebActionFactory.getCurrentRequest().getTableProvider() : null, null);
 		return actionOwner;
@@ -143,14 +137,6 @@ public class JWebWinFactory {
 		JBaseRecord actionOwner = getPackager().createRec(zWinBundle, id);
 		return actionOwner;
 	}
-//	public JBaseWin getBaseWinFromBundle(JWebActionData zWinBundle, boolean loadData, String id) throws Exception {
-//		JBaseWin actionOwner = this.createWin(zWinBundle, id);
-//		this.asignFilters(zWinBundle, actionOwner);
-//		this.asignProps(zWinBundle, actionOwner);
-//		if (loadData)
-//			this.loadData(actionOwner, true, JWebActionFactory.getCurrentRequest().hasTableProvider() ? JWebActionFactory.getCurrentRequest().getTableProvider() : null, null);
-//		return actionOwner;
-//	}
 
 	public String loadWinBundle() throws Exception {
 		return JWebActionFactory.getCurrentRequest().getArgument(JWebActionFactory.ACTION_DATA_PREFIX + "act_owner");
@@ -198,9 +184,6 @@ public class JWebWinFactory {
 		}
 		if (obj instanceof String) {
 //			PssLogger.logDebug("|------------------------------------------------> FIND STRING "+id);
-//			JWebActionFactory.getCurrentRequest().addDataBundle("act_owner", (String) obj);
-//			JWebActionData bundle=this.loadWinBundle();
-//			if (bundle==null) return null;
 			return this.getBaseWinFromBundle((String) obj, true, id);
 		}
 //		PssLogger.logDebug("|------------------------------------------------> NO FIND STRING "+id);
@@ -215,9 +198,6 @@ public class JWebWinFactory {
 			return actionOwner;
 		}
 		if (obj instanceof String) {
-//			JWebActionFactory.getCurrentRequest().addDataBundle("act_card", (String) obj);
-//			JWebActionData bundle=this.loadWinBundle("act_card");
-//			if (bundle==null) return null;
 			return this.getBaseWinFromBundle((String) obj, false, id);
 		}
 
@@ -327,9 +307,6 @@ public class JWebWinFactory {
 
 	private JWin getCard(JWin win, String providerRow, JWin table) throws Exception {
 		Object obj = processObjectRegisteredByIdForCard(providerRow);
-		// return ((JWin) obj);
-//		JObjBD objz = ((JObjBD)win.getRecord().getProp(providerRow,false));
-//		objz.setValue(((JWin) obj).getRecord());
 		return ((JWin) obj);
 	}
 
@@ -350,9 +327,6 @@ public class JWebWinFactory {
 
 	private void addRowWithData(int idx, JWin win, String providerRow, JRecords table, JWebActionData dataRow) throws Exception {
 		JRecord rec;
-//		if (!table.hasInfoRow()) {
-//			table.getStaticItems().removeAllElements(); // la info no trae info de row, se descarta y se toma como buena la que  viene del cliente
-//		}
 		if ((rec = table.findRowId(idx)) == null) {
 			rec = addRowToTable(win, providerRow, table, true);
 			rec.setRowId("" + idx);
