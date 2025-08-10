@@ -366,7 +366,40 @@ public class JWebWinFactory {
 
 	}
 
-	public void loadData(JBaseWin zActionOwner, boolean force, String zTableProvider, JBaseWin zContextOwner) throws Exception {
+        /**
+         * Carga la información enviada por la request dentro de la ventana.
+         * <p>
+         * Durante la carga se recorren todos los parámetros recibidos y se
+         * interpretan según su prefijo. Los formatos reconocidos son:
+         * </p>
+         * <ul>
+         * <li><b>Cards</b>: el nombre del parámetro contiene la cadena
+         * <code>"_card_"</code>. El valor asociado corresponde a los campos de una
+         * ventana anidada y se procesa mediante {@link #processCardElement}.</li>
+         * <li><b>Tablas</b>: el nombre comienza con <code>"dgt_"</code>. El valor
+         * utiliza el formato
+         * <pre>[tabla|campo,indice:nombreCampo,...]{indice:valor,...}{...}</pre>
+         * donde la sección entre corchetes define el nombre de la tabla destino y
+         * el mapa de índices a nombres de campo, mientras que cada grupo entre
+         * llaves representa una fila.</li>
+         * <li><b>Tablas extendidas</b>: contienen la cadena
+         * <code>"_row_"</code> y representan filas enviadas como datos
+         * independientes. Se interpretan con
+         * {@link #processTableExtendElement}.</li>
+         * </ul>
+         * Los valores de cada campo son decodificados posteriormente por
+         * {@link #controlsToBD} para actualizar las propiedades del
+         * {@link JRecord} correspondiente.
+         *
+         * @param zActionOwner ventana cuyo registro se debe popular
+         * @param force       indica si se fuerza la carga aunque la ventana no sea
+         *                    parseable
+         * @param zTableProvider nombre opcional del provider de tablas
+         * @param zContextOwner ventana de contexto a utilizar en lugar de
+         *                      {@code zActionOwner}
+         * @throws Exception si se produce algún problema durante el parseo
+         */
+        public void loadData(JBaseWin zActionOwner, boolean force, String zTableProvider, JBaseWin zContextOwner) throws Exception {
 		String tableProvider = zTableProvider;
 		boolean total = !JWebActionFactory.getCurrentRequest().isParcial();
 //		if (tableProvider!=null) tableProvider = zTableProvider;
@@ -411,7 +444,25 @@ public class JWebWinFactory {
 		buildWinsFromField(act.getSelecteds(), data);
 	}
 
-	public boolean processCardElement(String ds, boolean total, JList<String> finder, JWin win) throws Exception {
+        /**
+         * Procesa los datos correspondientes a un "card" dentro del request. Un
+         * card representa una ventana embebida dentro de otra.
+         * <p>
+         * El nombre del parámetro debe contener la cadena
+         * <code>"_card_"</code> e incluye información del provider y del
+         * identificador del objeto card. En caso de que el nombre también contenga
+         * <code>"_row_"</code> se trata de una tabla cuyos datos se parsean
+         * delegando en {@link #processTableElement}.
+         * </p>
+         *
+         * @param ds     nombre del parámetro recibido
+         * @param total  indica si la carga es completa o parcial
+         * @param finder lista que evita procesar el mismo provider más de una vez
+         * @param win    ventana base donde se inyectará la información del card
+         * @return {@code true} si el parámetro fue reconocido y procesado
+         * @throws Exception en caso de errores durante el parseo
+         */
+        public boolean processCardElement(String ds, boolean total, JList<String> finder, JWin win) throws Exception {
 		int p = ds.indexOf("-");
 		if (p == -1)
 			return false;
@@ -452,77 +503,124 @@ public class JWebWinFactory {
 		return true;
 	}
 
-	public boolean processTableElement(String ds, boolean total, JList<String> finder, JWin zwin) throws Exception {
-		if (!ds.startsWith("dgt_"))
-			return false;
-		String data = JWebActionFactory.getCurrentRequest().getArgument(ds);
-		String variableTable = null;
-		String fieldname = null;
-		JWin win = zwin;
-		TreeMap<Long, String> fieldnames = new TreeMap<Long, String>();
-		String toksField = JTools.getFirstTokens(data, '[', ']');
-		StringTokenizer toksFieldNamess = new StringTokenizer(toksField, ",");
-		while (toksFieldNamess.hasMoreTokens()) {
-			String posandvalue = toksFieldNamess.nextToken();
-			if (variableTable == null) {
-				variableTable = posandvalue.substring(0, posandvalue.indexOf('|'));
-				fieldname = posandvalue.substring(posandvalue.indexOf('|') + 1);
+        /**
+         * Procesa la serialización de una tabla enviada en un único parámetro.
+         * <p>
+         * El nombre del parámetro debe comenzar con el prefijo
+         * <code>"dgt_"</code>. El valor asociado utiliza la sintaxis:
+         * </p>
+         *
+         * <pre>
+         * [tabla|campo,indice:nombreCampo,...]{indice:valor,...}{...}
+         * </pre>
+         *
+         * donde:
+         * <ul>
+         * <li>Entre corchetes se especifica el nombre de la propiedad tabla del
+         * registro y un campo utilizado para asociar tarjetas.</li>
+         * <li>Los pares <code>indice:nombreCampo</code> definen el orden de los
+         * campos dentro de cada fila.</li>
+         * <li>Cada grupo entre llaves representa una fila utilizando los índices
+         * definidos.</li>
+         * </ul>
+         *
+         * @param ds     nombre del parámetro recibido
+         * @param total  indica si la carga es completa o parcial
+         * @param finder lista para evitar procesar repetidos
+         * @param zwin   ventana donde reside la tabla
+         * @return {@code true} si el parámetro es una tabla y se procesó
+         *         correctamente
+         * @throws Exception en caso de errores de parseo
+         */
+        public boolean processTableElement(String ds, boolean total, JList<String> finder, JWin zwin) throws Exception {
+                if (!ds.startsWith("dgt_"))
+                        return false;
+                String data = JWebActionFactory.getCurrentRequest().getArgument(ds);
+                String variableTable = null;
+                String fieldname = null;
+                JWin win = zwin;
+                TreeMap<Long, String> fieldnames = new TreeMap<Long, String>();
+                String toksField = JTools.getFirstTokens(data, '[', ']');
+                StringTokenizer toksFieldNamess = new StringTokenizer(toksField, ",");
+                while (toksFieldNamess.hasMoreTokens()) {
+                        String posandvalue = toksFieldNamess.nextToken();
+                        if (variableTable == null) {
+                                variableTable = posandvalue.substring(0, posandvalue.indexOf('|'));
+                                fieldname = posandvalue.substring(posandvalue.indexOf('|') + 1);
 
-				int p = fieldname.indexOf("-");
-				if (p != -1) {
-					int p2 = fieldname.indexOf("_card_");
-					if (p2 != -1) {
-						String providerCardObj = fieldname.substring(p2 + 1, p - 3);
-						JWin card = null;
-						card = getCard(win, providerCardObj, card);
-						if (card != null)
-							win = card;
-					}
-					;
-				}
+                                int p = fieldname.indexOf("-");
+                                if (p != -1) {
+                                        int p2 = fieldname.indexOf("_card_");
+                                        if (p2 != -1) {
+                                                String providerCardObj = fieldname.substring(p2 + 1, p - 3);
+                                                JWin card = null;
+                                                card = getCard(win, providerCardObj, card);
+                                                if (card != null)
+                                                        win = card;
+                                        }
+                                        ;
+                                }
 
-				continue;
-			}
-			StringTokenizer toksInternalFields = new StringTokenizer(posandvalue, ":");
-			long idxField = JTools.getLongFirstNumberEmbedded(toksInternalFields.nextToken());
-			String value = toksInternalFields.nextToken();
-			fieldnames.put(idxField, value);
+                                continue;
+                        }
+                        StringTokenizer toksInternalFields = new StringTokenizer(posandvalue, ":");
+                        long idxField = JTools.getLongFirstNumberEmbedded(toksInternalFields.nextToken());
+                        String value = toksInternalFields.nextToken();
+                        fieldnames.put(idxField, value);
 
-		}
+                }
 
-		// getCard(win, providerRow, table)
-		JRecords table = null;
-		table = getTable(win, variableTable, table);
-		if (table == null)
-			return false;
-		int idx = 0;
-		List<String> toks = JTools.getTokens(data, '{', '}');
-		Iterator<String> it = toks.iterator();
-		while (it.hasNext()) {
-			String stringRow = it.next();
-			StringTokenizer toksFields = new StringTokenizer(stringRow, ",");
-			JWebActionData dataRow = new JWebActionData("row_" + idx);
-			while (toksFields.hasMoreTokens()) {
-				String posandvalue = toksFields.nextToken();
-				long idxField = JTools.getLongFirstNumberEmbedded(posandvalue.substring(0, posandvalue.indexOf(":")));
-				String value = posandvalue.substring(posandvalue.indexOf(":") + 1);
-				dataRow.add(fieldnames.get(idxField), value);
-			}
-			addRowWithData(idx, win, variableTable, table, dataRow);
-			idx++;
+                // getCard(win, providerRow, table)
+                JRecords table = null;
+                table = getTable(win, variableTable, table);
+                if (table == null)
+                        return false;
+                int idx = 0;
+                List<String> toks = JTools.getTokens(data, '{', '}');
+                Iterator<String> it = toks.iterator();
+                while (it.hasNext()) {
+                        String stringRow = it.next();
+                        StringTokenizer toksFields = new StringTokenizer(stringRow, ",");
+                        JWebActionData dataRow = new JWebActionData("row_" + idx);
+                        while (toksFields.hasMoreTokens()) {
+                                String posandvalue = toksFields.nextToken();
+                                long idxField = JTools.getLongFirstNumberEmbedded(posandvalue.substring(0, posandvalue.indexOf(":")));
+                                String value = posandvalue.substring(posandvalue.indexOf(":") + 1);
+                                dataRow.add(fieldnames.get(idxField), value);
+                        }
+                        addRowWithData(idx, win, variableTable, table, dataRow);
+                        idx++;
 
-		}
+                }
 
-		if (table != null) {
-			JObjBDs dtable = (JObjBDs) win.getRecord().getProp(variableTable);
-			if (dtable != null)
-				dtable.setValue(table);
-		}
+                if (table != null) {
+                        JObjBDs dtable = (JObjBDs) win.getRecord().getProp(variableTable);
+                        if (dtable != null)
+                                dtable.setValue(table);
+                }
 
-		return true;
-	}
+                return true;
+        }
 
-	public boolean processTableExtendElement(String ds, boolean total, JList<String> finder, JWin win) throws Exception {
+        /**
+         * Procesa tablas cuyos datos vienen distribuidos en varios parámetros de la
+         * request. El nombre del parámetro debe incluir la cadena
+         * <code>"_row_"</code> seguida por el índice de fila. Este formato se
+         * utiliza cuando cada fila se envía como un formulario independiente.
+         *
+         * <p>Algunos nombres pueden contener el marcador <code>"__l"</code> para
+         * indicar listas anidadas. En todos los casos se reconstruye el
+         * {@link JRecords} asociado creando nuevas filas o completando las
+         * existentes.</p>
+         *
+         * @param ds     nombre del parámetro analizado
+         * @param total  indica si la carga es completa o parcial
+         * @param finder lista para evitar duplicados (puede ser {@code null})
+         * @param win    ventana que contiene la tabla a completar
+         * @return {@code true} si el parámetro representaba una tabla extendida
+         * @throws Exception si ocurre un error durante el parseo
+         */
+        public boolean processTableExtendElement(String ds, boolean total, JList<String> finder, JWin win) throws Exception {
 		int idx = 0;
 		JRecords table = null;
 		String providerRow;
