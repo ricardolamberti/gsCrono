@@ -781,7 +781,7 @@ public class JWebWinFactory {
 
 		if (zAction.needsFullSerialization()) {
 			byte[] serialized = JTools.stringToByteVector(JWebActionFactory.getCurrentRequest().serializeObject(zAction));
-			dict.put("a", JWebRequest.b64url(JWebRequest.deflate(serialized)));
+                        dict.put("a", JWinPackager.b64url(JWinPackager.deflate(serialized)));
 		} else {
 			String ownerPacked = baseWinToURL(zAction.getObjOwner());
 			if (ownerPacked != null && !ownerPacked.isEmpty()) {
@@ -808,7 +808,7 @@ public class JWebWinFactory {
 			String data = dict.containsKey("a") ? dict.get("a") : dict.get("action");
 			byte[] bytes;
 			if (dict.containsKey("a")) {
-				bytes = JWebRequest.inflate(JWebRequest.b64urlDecode(data));
+                                bytes = JWinPackager.inflate(JWinPackager.b64urlDecode(data));
 			} else {
 				bytes = Base64.getDecoder().decode(data);
 			}
