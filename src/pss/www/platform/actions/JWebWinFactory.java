@@ -5,7 +5,6 @@ import java.io.Serializable;
 import java.lang.ref.SoftReference;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.HashMap;
@@ -734,24 +733,34 @@ public class JWebWinFactory {
 		}
 	}
 
-	public JBaseWin getRegisterObjectTemp(String zKey) throws Exception {
-                byte[] decoded;
+        public JBaseWin getRegisterObjectTemp(String zKey) throws Exception {
                 try {
-                        decoded = Base64.getUrlDecoder().decode(zKey);
-                } catch (IllegalArgumentException e) {
-                        decoded = Base64.getDecoder().decode(zKey);
+                        return createWinFromPack(zKey, null);
+                } catch (Exception e) {
+                        byte[] decoded;
+                        try {
+                                decoded = java.util.Base64.getUrlDecoder().decode(zKey);
+                        } catch (IllegalArgumentException ex) {
+                                decoded = java.util.Base64.getDecoder().decode(zKey);
+                        }
+                        String json = JTools.byteVectorToString(decoded);
+                        return createWinFromJson(json, null);
                 }
-                return this.getBaseWinFromBundle((String) JTools.byteVectorToString(decoded), true, null);
         }
 
-	public JBaseRecord getRegisterObjectRecTemp(String zKey) throws Exception {
-                byte[] decoded;
+        public JBaseRecord getRegisterObjectRecTemp(String zKey) throws Exception {
                 try {
-                        decoded = Base64.getUrlDecoder().decode(zKey);
-                } catch (IllegalArgumentException e) {
-                        decoded = Base64.getDecoder().decode(zKey);
+                        return createRecFromPack(zKey, null);
+                } catch (Exception e) {
+                        byte[] decoded;
+                        try {
+                                decoded = java.util.Base64.getUrlDecoder().decode(zKey);
+                        } catch (IllegalArgumentException ex) {
+                                decoded = java.util.Base64.getDecoder().decode(zKey);
+                        }
+                        String json = JTools.byteVectorToString(decoded);
+                        return createRecFromJson(json, null);
                 }
-                return this.getBaseRecFromBundle((String) JTools.byteVectorToString(decoded), null);
         }
 
 	private boolean isExport() throws Exception {
@@ -789,16 +798,16 @@ public class JWebWinFactory {
                         byte[] serialized = JTools.stringToByteVector(JWebActionFactory.getCurrentRequest().serializeObject(zAction));
                         dict.put("a", JWebRequest.b64url(JWebRequest.deflate(serialized)));
                 } else {
-                        String owner = baseWinToURL(zAction.getObjOwner());
-                        if (owner != null && !owner.isEmpty()) {
-                                dict.put("o", JWebRequest.b64url(JTools.stringToByteVector(owner)));
+                        String ownerPacked = baseWinToURL(zAction.getObjOwner());
+                        if (ownerPacked != null && !ownerPacked.isEmpty()) {
+                                dict.put("o", ownerPacked);
                         }
                         if (zAction.hasSubmit()) {
                                 JAct submit = zAction.getObjSubmit();
                                 if (submit != null && submit.hasResult()) {
-                                        String result = baseWinToURL(submit.getResult());
-                                        if (result != null && !result.isEmpty()) {
-                                                dict.put("r", JWebRequest.b64url(JTools.stringToByteVector(result)));
+                                        String resultPacked = baseWinToURL(submit.getResult());
+                                        if (resultPacked != null && !resultPacked.isEmpty()) {
+                                                dict.put("r", resultPacked);
                                         }
                                 }
                         }
@@ -834,7 +843,7 @@ public class JWebWinFactory {
         }
 
         public String baseWinToURL(JBaseWin zOwner) throws Exception {
-                return baseWinToJSON(zOwner);
+                return baseWinToPack(zOwner); // b64url(deflate(JSON))
         }
 
 //
@@ -886,110 +895,113 @@ public class JWebWinFactory {
 //		}
 //		return JWebActionFactory.fieldsAsURLString(oData, false);
 //	}
-	private final ObjectMapper objectMapper = new ObjectMapper();
+        private final ObjectMapper objectMapper = new ObjectMapper();
 
-	// Serializar JBaseWin a JSON y codificar en Base64
-        
+        // Serializar JBaseWin y JBaseRecord a JSON plano
 
         public String baseWinToJSON(JBaseWin win) throws Exception {
-		JSerializableBaseWin serializableWin = prepareSerializableWin(win);
-		String json = objectMapper.writeValueAsString(serializableWin);
-
-		// Codificar en Base64
-		return Base64.getEncoder().encodeToString(json.getBytes(StandardCharsets.UTF_8));
-	}
+                JSerializableBaseWin serializableWin = prepareSerializableWin(win);
+                return objectMapper.writeValueAsString(serializableWin);
+        }
 
         public String baseRecToJSON(JBaseRecord rec) throws Exception {
                 JSerializableBaseWin serializableWin = prepareSerializableRec(rec, false);
-                String json = objectMapper.writeValueAsString(serializableWin);
+                return objectMapper.writeValueAsString(serializableWin);
+        }
 
-                // Codificar en Base64
-                return Base64.getEncoder().encodeToString(json.getBytes(StandardCharsets.UTF_8));
+        private static String packJson(String json) throws Exception {
+                byte[] raw = JTools.stringToByteArray(json);
+                return JWebRequest.b64url(JWebRequest.deflate(raw));
+        }
+
+        private static String unpackToJson(String packed) throws Exception {
+                byte[] raw = JWebRequest.inflate(JWebRequest.b64urlDecode(packed));
+                return JTools.byteVectorToString(raw);
+        }
+
+        // helpers públicos para wins/records
+        public String baseWinToPack(JBaseWin win) throws Exception {
+                return packJson(baseWinToJSON(win));
+        }
+
+        public String baseRecToPack(JBaseRecord rec) throws Exception {
+                return packJson(baseRecToJSON(rec));
         }
 
         public JBaseWin jsonToBaseWin(String json) throws Exception {
-                return createWin(json, null);
+                return createWinFromJson(json, null);
         }
 
         public JBaseRecord jsonToBaseRec(String json) throws Exception {
-                return createRec(json, null);
+                return createRecFromJson(json, null);
         }
 
 	// Método para deserializar desde JSON (como JAct u otros objetos)
 	public Object deserializeObject(String json, Class<?> clazz) throws IOException {
 		return objectMapper.readValue(json, clazz);
 	}
+        public JBaseWin createWinFromPack(String packed, String id) throws Exception {
+                String json = unpackToJson(packed);
+                return createWinFromJson(json, id);
+        }
 
-	public JBaseWin createWin(String encodedJson, String id) throws Exception {
-		// Decodificar JSON Base64
-		String jsonString = new String(org.apache.commons.codec.binary.Base64.decodeBase64(encodedJson), "UTF-8");
+        public JBaseRecord createRecFromPack(String packed, String id) throws Exception {
+                String json = unpackToJson(packed);
+                return createRecFromJson(json, id);
+        }
 
-		// Deserializar a JSerializableBaseWin usando Gson
-		JSerializableBaseWin serializableWin = (JSerializableBaseWin) deserializeObject(jsonString, JSerializableBaseWin.class);
+        public JBaseWin createWinFromJson(String json, String id) throws Exception {
+                JSerializableBaseWin dto = (JSerializableBaseWin) deserializeObject(json, JSerializableBaseWin.class);
+                String sUniqueId = (id != null) ? id : dto.uniqueId;
+                JBaseWin actionOwner = getOrCreateWin(dto.cls, sUniqueId);
+                actionOwner.setUniqueID(sUniqueId);
+                actionOwner.SetVision(dto.vision);
+                if (actionOwner.isWin())
+                        ((JWin) actionOwner).getRecord().setDatosLeidos(dto.readed);
+                assignFilters(dto, actionOwner.GetBaseDato());
+                assignProps(dto, actionOwner.GetBaseDato());
+                if (dto.drop != null)
+                        actionOwner.setDropListener(this.createWinFromPack(pss.core.tools.JTools.byteVectorToString(java.util.Base64.getDecoder().decode(dto.drop)), null));
+                if (dto.dropControl != null)
+                        actionOwner.setDropControlIdListener((JAct) JWebActionFactory.getCurrentRequest()
+                                        .deserializeObject(pss.core.tools.JTools.byteVectorToString(java.util.Base64.getDecoder().decode(dto.dropControl))));
+                return actionOwner;
+        }
 
-		// Obtener o crear la instancia original de JBaseWin
-		String sUniqueId = id != null ? id : serializableWin.uniqueId;
-		JBaseWin win = getRememberWin(sUniqueId);
-		if (win != null)
-			return win;
-		JBaseWin actionOwner = getOrCreateWin(serializableWin.cls, sUniqueId);
-		actionOwner.setUniqueID(sUniqueId);
-		// Asignar propiedades básicas
-		actionOwner.SetVision(serializableWin.vision);
-		if (actionOwner.isWin()) {
-			((JWin) actionOwner).getRecord().setDatosLeidos(serializableWin.readed);
-		}
+        public JBaseRecord createRecFromJson(String json, String id) throws Exception {
+                JSerializableBaseWin dto = (JSerializableBaseWin) deserializeObject(json, JSerializableBaseWin.class);
+                String sUniqueId = (id != null) ? id : dto.uniqueId;
+                JBaseRecord actionOwner = getOrCreateRec(dto.cls, sUniqueId);
+                actionOwner.SetVision(dto.vision);
+                if (actionOwner instanceof JRecord)
+                        ((JRecord) actionOwner).setDatosLeidos(dto.readed);
+                if (actionOwner instanceof JRecords)
+                        ((JRecords) actionOwner).setRecordRef(dto.recordClass);
+                assignFilters(dto, actionOwner);
+                assignProps(dto, actionOwner);
+                asaignElements(dto, actionOwner);
+                return actionOwner;
+        }
 
-		// Asignar filtros y propiedades usando los métodos adaptados
-		assignFilters(serializableWin, actionOwner.GetBaseDato());
-		assignProps(serializableWin, actionOwner.GetBaseDato());
+        // Compatibilidad: intentar pack y luego Base64(JSON)
+        public JBaseWin createWin(String s, String id) throws Exception {
+                try {
+                        return createWinFromPack(s, id);
+                } catch (Exception ignore) {
+                        String json = new String(org.apache.commons.codec.binary.Base64.decodeBase64(s), "UTF-8");
+                        return createWinFromJson(json, id);
+                }
+        }
 
-		// Asignar listeners si existen
-
-		if (serializableWin.drop != null) {
-//			JWebActionFactory.getCurrentRequest().addDataBundle("act_drop", (String) JTools.byteVectorToString(Base64.getDecoder().decode(zWinBundle.get("drop"))));
-//			JWebActionData bundle = loadWinBundle("act_drop");
-//			if (bundle == null)
-//				return null;
-			actionOwner.setDropListener(this.getBaseWinFromBundle((String) JTools.byteVectorToString(Base64.getDecoder().decode(serializableWin.drop))));
-
-		}
-		if (serializableWin.dropControl != null) {
-			actionOwner.setDropControlIdListener((JAct) JWebActionFactory.getCurrentRequest().deserializeObject(JTools.byteVectorToString(Base64.getDecoder().decode(serializableWin.dropControl))));
-		}
-
-		return actionOwner;
-	}
-
-	public JBaseRecord createRec(String encodedJson, String id) throws Exception {
-		// Decodificar JSON Base64
-		String jsonString = new String(org.apache.commons.codec.binary.Base64.decodeBase64(encodedJson), "UTF-8");
-
-		// Deserializar a JSerializableBaseWin usando Gson
-		JSerializableBaseWin serializableWin = (JSerializableBaseWin) deserializeObject(jsonString, JSerializableBaseWin.class);
-
-		// Obtener o crear la instancia original de JBaseWin
-		String sUniqueId = id != null ? id : serializableWin.uniqueId;
-		JBaseRecord actionOwner = getOrCreateRec(serializableWin.cls, sUniqueId);
-
-		// Asignar propiedades básicas
-		actionOwner.SetVision(serializableWin.vision);
-		if (actionOwner instanceof JRecord) {
-			((JRecord) actionOwner).setDatosLeidos(serializableWin.readed);
-		}
-		if (actionOwner instanceof JRecords) {
-			((JRecords) actionOwner).setRecordRef(serializableWin.recordClass);
-		}
-
-		// Asignar filtros y propiedades usando los métodos adaptados
-		assignFilters(serializableWin, actionOwner);
-		assignProps(serializableWin, actionOwner);
-		asaignElements(serializableWin, actionOwner);
-
-		return actionOwner;
-	}
-
-	private void asaignElements(JSerializableBaseWin serializableWin, JBaseRecord actionOwner) throws Exception {
+        public JBaseRecord createRec(String s, String id) throws Exception {
+                try {
+                        return createRecFromPack(s, id);
+                } catch (Exception ignore) {
+                        String json = new String(org.apache.commons.codec.binary.Base64.decodeBase64(s), "UTF-8");
+                        return createRecFromJson(json, id);
+                }
+        }
+        private void asaignElements(JSerializableBaseWin serializableWin, JBaseRecord actionOwner) throws Exception {
 		if (!(actionOwner instanceof JRecords) || serializableWin.elements == null)
 			return;
 		JRecords recs = (JRecords<JRecord>) actionOwner;
@@ -1146,12 +1158,12 @@ public class JWebWinFactory {
 		JSerializableBaseWin serializableWin = prepareSerializableRec(win.GetBaseDato(), win.canConvertToURL());
 		serializableWin.cls = win.getClass().getName();
 
-		if (win.hasDropListener()) {
-			serializableWin.drop = Base64.getEncoder().encodeToString(JTools.stringToByteArray(baseWinToJSON(win.getDropListener())));
-		}
-		if (win.hasDropControlIdListener()) {
-			serializableWin.dropControl = Base64.getEncoder().encodeToString(JTools.stringToByteArray(JWebActionFactory.getCurrentRequest().serializeObject(win.getDropControlIdListener())));
-		}
+                if (win.hasDropListener()) {
+                        serializableWin.drop = Base64.getEncoder().encodeToString(JTools.stringToByteArray(baseWinToPack(win.getDropListener())));
+                }
+                if (win.hasDropControlIdListener()) {
+                        serializableWin.dropControl = Base64.getEncoder().encodeToString(JTools.stringToByteArray(JWebActionFactory.getCurrentRequest().serializeObject(win.getDropControlIdListener())));
+                }
 		return serializableWin;
 	}
 
@@ -1227,14 +1239,14 @@ public class JWebWinFactory {
 				else if (fieldValue instanceof JRecords) {
 					String serialized = JWebActionFactory.getCurrentRequest().registerRecObjectObj((JRecords) fieldValue);
 					serializableWin.properties.put("SRECS_" + fieldName, serialized);
-				} else if (fieldValue instanceof String || fieldValue.getClass().isPrimitive()) {
-					serializableWin.properties.put("OTH_" + fieldName, fieldValue.toString());
-				} else if (fieldValue instanceof Serializable) {
-					Serializable serObj = (Serializable) fieldValue;
-					serializableWin.properties.put("SER_" + fieldName, Base64.getEncoder().encodeToString(JTools.stringToByteArray(JWebActionFactory.getCurrentRequest().serializeObject(serObj))));
-				} else if (fieldValue instanceof Serializable) {
-					serializableWin.properties.put("OTH_" + fieldName, fieldValue.toString());
-				}
+                                } else if (fieldValue instanceof String || fieldValue.getClass().isPrimitive()) {
+                                        serializableWin.properties.put("OTH_" + fieldName, fieldValue.toString());
+                                } else if (fieldValue instanceof Serializable) {
+                                        Serializable serObj = (Serializable) fieldValue;
+                                        serializableWin.properties.put("SER_" + fieldName, Base64.getEncoder().encodeToString(JTools.stringToByteArray(JWebActionFactory.getCurrentRequest().serializeObject(serObj))));
+                                } else {
+                                        serializableWin.properties.put("OTH_" + fieldName, fieldValue.toString());
+                                }
 			}
 		}
 
