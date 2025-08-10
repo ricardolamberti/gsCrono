@@ -916,8 +916,8 @@ public class JWebRequest {
 				}
 			}
 		}
-		pack.localRegisteredObject = getRegisteredObjectsNew();
 		pack.localHistoryManager = getHistoryManager().serializeHistoryManager();
+		pack.localRegisteredObject = getRegisteredObjectsNew();
 		return serializeRegisterJSON(pack);
 	}
 
@@ -1005,11 +1005,11 @@ public class JWebRequest {
 			if (dictionary == null || dictionary.isEmpty())
 				return;
 			pack = (JWebRequestPackage) deserializeRegisterJSON(dictionary);
+			oRegisteredObjectsOld = pack.localRegisteredObject;
 			if (getHistoryManager().sizeHistory() == 0) {
 				getHistoryManager().deserializeHistoryManager(pack.localHistoryManager);
 				factory.fillHistory();
 			}
-			oRegisteredObjectsOld = pack.localRegisteredObject;
 			if (preserve)
 				getRegisteredObjectsNew().putAll(pack.localRegisteredObject);
 			JWebApplication app = JWebServer.getInstance().getWebApplication(null);
