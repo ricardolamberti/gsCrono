@@ -46,14 +46,14 @@ public class JWebWinFactory {
 
 	IControlToBD controToBD;
 
-        TreeMap<String, SoftReference<JBaseWin>> winRefference = new TreeMap<String, SoftReference<JBaseWin>>();
-        TreeMap<String, SoftReference<JBaseRecord>> recRefference = new TreeMap<String, SoftReference<JBaseRecord>>();
+	TreeMap<String, SoftReference<JBaseWin>> winRefference = new TreeMap<String, SoftReference<JBaseWin>>();
+	TreeMap<String, SoftReference<JBaseRecord>> recRefference = new TreeMap<String, SoftReference<JBaseRecord>>();
 
-        private final JWinPackager packager = new JWinPackager(this);
+	private final JWinPackager packager = new JWinPackager(this);
 
-        public JWinPackager getPackager() {
-                return packager;
-        }
+	public JWinPackager getPackager() {
+		return packager;
+	}
 
 	public TreeMap<String, SoftReference<JBaseWin>> getWinRefference() {
 		return winRefference;
@@ -136,7 +136,7 @@ public class JWebWinFactory {
 	}
 
 	public JBaseWin getBaseWinFromBundle(String zWinBundle, boolean loadData, String id) throws Exception {
-		JBaseWin actionOwner = this.createWin(zWinBundle, id);
+		JBaseWin actionOwner = getPackager() .createWin(zWinBundle, id);
 //		this.asignFilters(zWinBundle, actionOwner);
 //		this.asignProps(zWinBundle, actionOwner);
 		if (loadData)
@@ -145,7 +145,7 @@ public class JWebWinFactory {
 	}
 
 	public JBaseRecord getBaseRecFromBundle(String zWinBundle, String id) throws Exception {
-		JBaseRecord actionOwner = this.createRec(zWinBundle, id);
+		JBaseRecord actionOwner = getPackager().createRec(zWinBundle, id);
 		return actionOwner;
 	}
 //	public JBaseWin getBaseWinFromBundle(JWebActionData zWinBundle, boolean loadData, String id) throws Exception {
@@ -642,13 +642,13 @@ public class JWebWinFactory {
 		}
 	}
 
-        public JBaseWin getRegisterObjectTemp(String zKey) throws Exception {
-                return packager.getRegisterObjectTemp(zKey);
-        }
+	public JBaseWin getRegisterObjectTemp(String zKey) throws Exception {
+		return packager.getRegisterObjectTemp(zKey);
+	}
 
-        public JBaseRecord getRegisterObjectRecTemp(String zKey) throws Exception {
-                return packager.getRegisterObjectRecTemp(zKey);
-        }
+	public JBaseRecord getRegisterObjectRecTemp(String zKey) throws Exception {
+		return packager.getRegisterObjectRecTemp(zKey);
+	}
 
 	private boolean isExport() throws Exception {
 		JWebActionData p = JWebActionFactory.getCurrentRequest().getData("export");
@@ -747,7 +747,7 @@ public class JWebWinFactory {
 			@Override
 			public String apply(String k) {
 				try {
-                                        return packager.baseWinToPack(zOwner);
+					return packager.baseWinToPack(zOwner);
 				} catch (Exception e) {
 					throw new RuntimeException(e);
 				}
@@ -761,7 +761,7 @@ public class JWebWinFactory {
 			@Override
 			public String apply(String k) {
 				try {
-                                        return packager.baseRecToPack(rec);
+					return packager.baseRecToPack(rec);
 				} catch (Exception e) {
 					throw new RuntimeException(e);
 				}
