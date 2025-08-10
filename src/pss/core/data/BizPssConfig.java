@@ -148,7 +148,7 @@ public class BizPssConfig {
 			value = sDefault;
 		if (value == null) {
 			if (exc)
-				JExcepcion.SendError("No se encontrÛ el par·metro^" + " " + sParametro);
+				JExcepcion.SendError("No se encontr√≥ el par√°metro^" + " " + sParametro);
 			return null;
 		}
 		this.setProperty(sParametro, value);
@@ -191,7 +191,7 @@ public class BizPssConfig {
 			value = sDefault;
 		if (value == null) {
 			if (exc)
-				JExcepcion.SendError("No se encontrÛ el par·metro^" + " " + sParametro);
+				JExcepcion.SendError("No se encontr√≥ el par√°metro^" + " " + sParametro);
 			return null;
 		}
 		this.setStrictProperty(sSeccion, sParametro, value);
@@ -778,4 +778,40 @@ public class BizPssConfig {
 	public String getClusteringByCompany(String company) throws Exception {
 		return getIniFile().GetParamValue("CLUSTERING", company);
 	}
+    // ---------------------------------------------------------------------
+    // Cache replication configuration
+
+    private static String getPropEnvOrIni(String key, String def) {
+        String v = System.getProperty(key);
+        if (v == null) v = System.getenv(key.replace('.', '_').toUpperCase());
+        if (v == null) {
+            try {
+                v = BizPssConfig.getPssConfig().getCachedValue("GENERAL", key, null);
+            } catch (Exception e) {
+                v = null;
+            }
+        }
+        return v != null ? v : def;
+    }
+
+    public static boolean isCacheReplicationEnabled() {
+        return Boolean.parseBoolean(getPropEnvOrIni("pss.cache.replication.enabled", "false"));
+    }
+
+    public static String getMemcachedHost() {
+        return getPropEnvOrIni("pss.cache.memcached.host", "localhost");
+    }
+
+    public static int getMemcachedPort() {
+        return Integer.parseInt(getPropEnvOrIni("pss.cache.memcached.port", "11211"));
+    }
+
+    public static int getMemcachedDefaultTtlSeconds() {
+        return Integer.parseInt(getPropEnvOrIni("pss.cache.memcached.ttl.default.seconds", "3600"));
+    }
+
+    public static int getMemcachedTimeoutMs() {
+        return Integer.parseInt(getPropEnvOrIni("pss.cache.memcached.timeout.ms", "100"));
+    }
+
 }
