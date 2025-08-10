@@ -801,13 +801,13 @@ public class JWebRequest {
 			getRegisteredObjectsNew().put(id, CACHE_PREFIX + id);
 			return CACHE_PREFIX + id;
 		}
-		if (objectsCreated.containsKey(zObject.getUniqueId()))
-			return objectsCreated.get(zObject.getUniqueId());
-		String json = new JWebWinFactory(null).baseWinToJSON(zObject);
-		String out = "obj_t_" + b64url(deflate(JTools.stringToByteArray(json)));
-		objectsCreated.put(zObject.getUniqueId(), out);
-		return out;
-	}
+               if (objectsCreated.containsKey(zObject.getUniqueId()))
+                       return objectsCreated.get(zObject.getUniqueId());
+               String packed = new JWebWinFactory(null).baseWinToJSON(zObject);
+               String out = "obj_t_" + packed;
+               objectsCreated.put(zObject.getUniqueId(), out);
+               return out;
+        }
 
 	public synchronized String registerRecObjectObj(JBaseRecord zObject) throws Exception {
 		if (zObject == null)
@@ -820,11 +820,11 @@ public class JWebRequest {
 			getRegisteredObjectsNew().put(key, CACHE_PREFIX + key);
 			return key;
 		}
-		String json = new JWebWinFactory(null).baseRecToJSON(zObject);
-		String payload = "obj_rec_" + b64url(deflate(JTools.stringToByteArray(json)));
-		getRegisteredObjectsNew().put(key, payload);
-		return key;
-	}
+               String packed = new JWebWinFactory(null).baseRecToJSON(zObject);
+               String payload = "obj_rec_" + packed;
+               getRegisteredObjectsNew().put(key, payload);
+               return key;
+        }
 
 	public Serializable getRegisterObject(String key) {
 		String obj = getRegisteredObjectsOld().get(key);
@@ -842,22 +842,22 @@ public class JWebRequest {
 			if (obj.startsWith("obj_rec:")) {
 				return (Serializable) fetchFromCache(obj.substring(8));
 			}
-			if (obj.startsWith("obj_t_")) {
-				String payload = obj.substring(6);
-				byte[] raw = inflate(b64urlDecode(payload));
-				String json = JTools.byteVectorToString(raw);
-				return new JWebWinFactory(null).jsonToBaseWin(json);
-			}
-			if (obj.startsWith("obj_rec_")) {
-				String payload = obj.substring(8);
-				byte[] raw = inflate(b64urlDecode(payload));
-				String json = JTools.byteVectorToString(raw);
-				return new JWebWinFactory(null).jsonToBaseRec(json);
-			}
-			return deserializeObject(obj);
-		} catch (Exception e) {
-			PssLogger.logError(e);
-			return null;
+                       if (obj.startsWith("obj_t_")) {
+                               String payload = obj.substring(6);
+                               byte[] raw = inflate(Base64.getDecoder().decode(payload));
+                               String json = JTools.byteVectorToString(raw);
+                               return new JWebWinFactory(null).jsonToBaseWin(json);
+                       }
+                       if (obj.startsWith("obj_rec_")) {
+                               String payload = obj.substring(8);
+                               byte[] raw = inflate(Base64.getDecoder().decode(payload));
+                               String json = JTools.byteVectorToString(raw);
+                               return new JWebWinFactory(null).jsonToBaseRec(json);
+                       }
+                       return deserializeObject(obj);
+               } catch (Exception e) {
+                       PssLogger.logError(e);
+                       return null;
 		}
 	}
 
@@ -1113,10 +1113,8 @@ public class JWebRequest {
 //		if (zOwner.isModeWinLov()) return serializeObject(zOwner);
 //		if (!zOwner.isReaded()) return serializeObject(zOwner);
 
-		String json = new JWebWinFactory(null).baseWinToJSON(zOwner);
-		byte[] raw = JTools.stringToByteArray(json);
-		String packed = b64url(deflate(raw));
-		return "obj_t_" + packed;
-	}
+               String packed = new JWebWinFactory(null).baseWinToJSON(zOwner);
+               return "obj_t_" + packed;
+        }
 
 }

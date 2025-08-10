@@ -2,13 +2,11 @@ package pss.www.platform.applications;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Base64;
 import java.util.List;
 import java.util.Map;
 
 import pss.core.services.records.JFilterMap;
 import pss.core.tools.JPair;
-import pss.core.tools.JTools;
 import pss.core.tools.collections.JCollectionFactory;
 import pss.core.tools.collections.JIterator;
 import pss.core.tools.collections.JMap;
@@ -69,13 +67,13 @@ public class JHistoryProvider implements Serializable {
 		
 		if (multipleSelect != null) {
 			multiSelectName = zMultipleSelect.getClass().getCanonicalName();
-			JIterator<JWin> it = zMultipleSelect.getStaticIterator();
-			while(it.hasMoreElements()) {
-				JWin win = it.nextElement();
-				multipleSelect.add(Base64.getEncoder().encodeToString(JTools.stringToByteArray(new JWebWinFactory(null).baseWinToJSON(win))));
-			}
-		}
-	}
+                       JIterator<JWin> it = zMultipleSelect.getStaticIterator();
+                       while(it.hasMoreElements()) {
+                               JWin win = it.nextElement();
+                               multipleSelect.add(new JWebWinFactory(null).baseWinToJSON(win));
+                       }
+               }
+       }
 
 	public JHistoryProvider() {
 	}
