@@ -12,7 +12,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
-import java.util.zip.DataFormatException;
 import java.util.zip.Deflater;
 import java.util.zip.Inflater;
 
@@ -42,6 +41,46 @@ public class JWinPackager {
             .expireAfterAccess(10, TimeUnit.MINUTES)
             .build();
 
+    public static String b64url(byte[] data) {
+        return Base64.getUrlEncoder().withoutPadding().encodeToString(data);
+    }
+
+    public static byte[] b64urlDecode(String data) {
+        return Base64.getUrlDecoder().decode(data);
+    }
+
+    public static byte[] deflate(byte[] input) {
+        Deflater deflater = new Deflater();
+        deflater.setInput(input);
+        deflater.finish();
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        byte[] buffer = new byte[1024];
+        while (!deflater.finished()) {
+            int count = deflater.deflate(buffer);
+            baos.write(buffer, 0, count);
+        }
+        deflater.end();
+        return baos.toByteArray();
+    }
+
+    public static byte[] inflate(byte[] input) throws IOException {
+        Inflater inflater = new Inflater();
+        inflater.setInput(input);
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        byte[] buffer = new byte[1024];
+        try {
+            while (!inflater.finished()) {
+                int count = inflater.inflate(buffer);
+                baos.write(buffer, 0, count);
+            }
+        } catch (java.util.zip.DataFormatException e) {
+            throw new IOException(e);
+        } finally {
+            inflater.end();
+        }
+        return baos.toByteArray();
+    }
+
     public JWinPackager(JWebWinFactory factory) {
         this.factory = factory;
     }
@@ -58,7 +97,7 @@ public class JWinPackager {
             }
             String json;
             try {
-                json = new String(decompress(decoded), StandardCharsets.UTF_8);
+                json = new String(inflate(decoded), StandardCharsets.UTF_8);
             } catch (Exception ex2) {
                 json = JTools.byteVectorToString(decoded);
             }
@@ -78,7 +117,7 @@ public class JWinPackager {
             }
             String json;
             try {
-                json = new String(decompress(decoded), StandardCharsets.UTF_8);
+                json = new String(inflate(decoded), StandardCharsets.UTF_8);
             } catch (Exception ex2) {
                 json = JTools.byteVectorToString(decoded);
             }
@@ -108,7 +147,7 @@ public class JWinPackager {
         if (cached != null)
             return cached;
         String json = serializeWinToJson(win);
-        String encoded = Base64.getEncoder().encodeToString(compress(json.getBytes(StandardCharsets.UTF_8)));
+        String encoded = Base64.getEncoder().encodeToString(deflate(json.getBytes(StandardCharsets.UTF_8)));
         SERIALIZATION_CACHE.put(key, encoded);
         return encoded;
     }
@@ -119,49 +158,19 @@ public class JWinPackager {
         if (cached != null)
             return cached;
         String json = serializeRecToJson(rec);
-        String encoded = Base64.getEncoder().encodeToString(compress(json.getBytes(StandardCharsets.UTF_8)));
+        String encoded = Base64.getEncoder().encodeToString(deflate(json.getBytes(StandardCharsets.UTF_8)));
         SERIALIZATION_CACHE.put(key, encoded);
         return encoded;
     }
 
-    private static byte[] compress(byte[] data) throws IOException {
-        Deflater deflater = new Deflater(Deflater.BEST_COMPRESSION);
-        deflater.setInput(data);
-        deflater.finish();
-        try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
-            byte[] buffer = new byte[1024];
-            while (!deflater.finished()) {
-                int count = deflater.deflate(buffer);
-                baos.write(buffer, 0, count);
-            }
-            return baos.toByteArray();
-        } finally {
-            deflater.end();
-        }
-    }
-
-    public static byte[] decompress(byte[] data) throws IOException, DataFormatException {
-        Inflater inflater = new Inflater();
-        inflater.setInput(data);
-        try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
-            byte[] buffer = new byte[1024];
-            while (!inflater.finished()) {
-                int count = inflater.inflate(buffer);
-                baos.write(buffer, 0, count);
-            }
-            return baos.toByteArray();
-        } finally {
-            inflater.end();
-        }
-    }
 
     private static String packJson(String json) throws Exception {
         byte[] raw = JTools.stringToByteArray(json);
-        return JWebRequest.b64url(JWebRequest.deflate(raw));
+        return b64url(deflate(raw));
     }
 
     private static String unpackToJson(String packed) throws Exception {
-        byte[] raw = JWebRequest.inflate(JWebRequest.b64urlDecode(packed));
+        byte[] raw = inflate(b64urlDecode(packed));
         return JTools.byteVectorToString(raw);
     }
 
@@ -231,8 +240,8 @@ public class JWinPackager {
         byte[] decoded = Base64.getDecoder().decode(encoded);
         String json;
         try {
-            json = new String(decompress(decoded), StandardCharsets.UTF_8);
-        } catch (DataFormatException e) {
+            json = new String(inflate(decoded), StandardCharsets.UTF_8);
+        } catch (IOException e) {
             json = new String(decoded, StandardCharsets.UTF_8);
         }
         return createWinFromJson(json, id);
@@ -242,8 +251,8 @@ public class JWinPackager {
         byte[] decoded = Base64.getDecoder().decode(encoded);
         String json;
         try {
-            json = new String(decompress(decoded), StandardCharsets.UTF_8);
-        } catch (DataFormatException e) {
+            json = new String(inflate(decoded), StandardCharsets.UTF_8);
+        } catch (IOException e) {
             json = new String(decoded, StandardCharsets.UTF_8);
         }
         return createRecFromJson(json, id);

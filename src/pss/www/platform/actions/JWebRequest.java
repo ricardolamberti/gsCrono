@@ -22,8 +22,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import java.security.MessageDigest;
-import java.util.zip.Deflater;
-import java.util.zip.Inflater;
 import java.time.Duration;
 import java.util.UUID;
 
@@ -844,13 +842,13 @@ public class JWebRequest {
 			}
                        if (obj.startsWith("obj_t_")) {
                                String payload = obj.substring(6);
-                               byte[] raw = inflate(Base64.getDecoder().decode(payload));
+                               byte[] raw = JWinPackager.inflate(Base64.getDecoder().decode(payload));
                                String json = JTools.byteVectorToString(raw);
                                return new JWinPackager(new JWebWinFactory(null)).jsonToBaseWin(json);
                        }
                        if (obj.startsWith("obj_rec_")) {
                                String payload = obj.substring(8);
-                               byte[] raw = inflate(Base64.getDecoder().decode(payload));
+                               byte[] raw = JWinPackager.inflate(Base64.getDecoder().decode(payload));
                                String json = JTools.byteVectorToString(raw);
                                return new JWinPackager(new JWebWinFactory(null)).jsonToBaseRec(json);
                        }
@@ -1064,46 +1062,6 @@ public class JWebRequest {
 			PssLogger.logError(e);
 		}
 		return null;
-	}
-
-	public static String b64url(byte[] data) {
-		return Base64.getUrlEncoder().withoutPadding().encodeToString(data);
-	}
-
-	public static byte[] b64urlDecode(String data) {
-		return Base64.getUrlDecoder().decode(data);
-	}
-
-	public static byte[] deflate(byte[] input) {
-		Deflater deflater = new Deflater();
-		deflater.setInput(input);
-		deflater.finish();
-		ByteArrayOutputStream baos = new ByteArrayOutputStream();
-		byte[] buffer = new byte[1024];
-		while (!deflater.finished()) {
-			int count = deflater.deflate(buffer);
-			baos.write(buffer, 0, count);
-		}
-		deflater.end();
-		return baos.toByteArray();
-	}
-
-	public static byte[] inflate(byte[] input) throws IOException {
-		Inflater inflater = new Inflater();
-		inflater.setInput(input);
-		ByteArrayOutputStream baos = new ByteArrayOutputStream();
-		byte[] buffer = new byte[1024];
-		try {
-			while (!inflater.finished()) {
-				int count = inflater.inflate(buffer);
-				baos.write(buffer, 0, count);
-			}
-		} catch (java.util.zip.DataFormatException e) {
-			throw new IOException(e);
-		} finally {
-			inflater.end();
-		}
-		return baos.toByteArray();
 	}
 
 	public static String baseWinToSession(JBaseWin zOwner) throws Exception {
