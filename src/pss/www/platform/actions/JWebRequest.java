@@ -15,7 +15,6 @@ import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Type;
 import java.security.MessageDigest;
-import java.time.Duration;
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -25,8 +24,6 @@ import java.util.UUID;
 
 import org.apache.cocoon.environment.Request;
 
-import com.github.benmanes.caffeine.cache.Cache;
-import com.github.benmanes.caffeine.cache.Caffeine;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -38,6 +35,8 @@ import pss.core.tools.collections.JIterator;
 import pss.core.tools.collections.JMap;
 import pss.core.win.JBaseWin;
 import pss.core.win.submits.JAct;
+import pss.www.platform.cache.CacheProvider;
+import pss.www.platform.cache.DistCache;
 import pss.www.platform.actions.requestBundle.JWebActionData;
 import pss.www.platform.actions.requestBundle.JWebActionDataBundle;
 import pss.www.platform.applications.JWebApplication;
@@ -74,10 +73,8 @@ public class JWebRequest {
 	private JWebHistoryManager oHistoryManager;
 
 	// Cache for large or server-only objects
-	private static final String CACHE_PREFIX = "cache:";
-	private static final long CACHE_MAX_SIZE = Long.getLong("jwebrequest.cache.maxSize", 1000L);
-	private static final long CACHE_EXPIRE_MINUTES = Long.getLong("jwebrequest.cache.expireMinutes", 10L);
-	private static final Cache<String, Serializable> LARGE_OBJECT_CACHE = Caffeine.newBuilder().maximumSize(CACHE_MAX_SIZE).expireAfterAccess(Duration.ofMinutes(CACHE_EXPIRE_MINUTES)).build();
+        private static final String CACHE_PREFIX = "cache:";
+        private static final long CACHE_EXPIRE_SECONDS = Long.getLong("jwebrequest.cache.expireMinutes", 10L) * 60L;
 
 	/**
 	 * Lightweight snapshot of the request's registered objects and history manager.
@@ -709,16 +706,14 @@ public class JWebRequest {
 		return sb.toString();
 	}
 
-	private Object fetchFromCache(String handle) {
-		try {
-			Class<?> clazz = Class.forName("pss.www.platform.cache.Caches");
-			Object big = clazz.getField("BIG").get(null);
-			java.lang.reflect.Method m = big.getClass().getMethod("getIfPresent", Object.class);
-			return m.invoke(big, handle);
-		} catch (Exception e) {
-			return null;
-		}
-	}
+        private Object fetchFromCache(String handle) {
+                try {
+                        byte[] data = CacheProvider.get().getBytes(handle);
+                        return deserializeObjectFromBytes(data);
+                } catch (Exception e) {
+                        return null;
+                }
+        }
 
 	public Object getRegisteredRequestObject(String key) {
 		return this.getRegisteredRequest().getElement(key);
@@ -751,9 +746,9 @@ public class JWebRequest {
 		return true;
 	}
 
-	public static void purgeExpiredCache() {
-		LARGE_OBJECT_CACHE.cleanUp();
-	}
+        public static void purgeExpiredCache() {
+                // No-op; local cache manages its own eviction
+        }
 
 	public synchronized String registerObjectObj(Serializable zObject) throws Exception {
 		return registerObjectObj(zObject, false);
@@ -763,19 +758,19 @@ public class JWebRequest {
 		return registerObjectObj(zObject, true);
 	}
 
-	public synchronized String registerObjectObj(Serializable zObject, boolean temp) throws Exception {
-		if (temp && zObject instanceof JBaseWin)
-			return registerWinObjectObj((JBaseWin) zObject);
-		if (isLargeObject(zObject)) {
-			String id = "obj_c_" + UUID.randomUUID().toString();
-			LARGE_OBJECT_CACHE.put(id, zObject);
-			getRegisteredObjectsNew().put(id, CACHE_PREFIX + id);
-			return id;
-		}
-		String payload = serializeObject(zObject);
-		String id = "obj_p_" + sha256(JTools.stringToByteArray(payload));
-		if (reuseIfPresent(id) != null)
-			return id;
+        public synchronized String registerObjectObj(Serializable zObject, boolean temp) throws Exception {
+                if (temp && zObject instanceof JBaseWin)
+                        return registerWinObjectObj((JBaseWin) zObject);
+                if (isLargeObject(zObject)) {
+                        String id = "obj_c_" + UUID.randomUUID().toString();
+                        CacheProvider.get().putBytes(id, serializeObjectToBytes(zObject), CACHE_EXPIRE_SECONDS);
+                        getRegisteredObjectsNew().put(id, CACHE_PREFIX + id);
+                        return id;
+                }
+                String payload = serializeObject(zObject);
+                String id = "obj_p_" + sha256(JTools.stringToByteArray(payload));
+                if (reuseIfPresent(id) != null)
+                        return id;
 		this.getRegisteredObjectsNew().put(id, payload);
 		return id;
 	}
@@ -783,34 +778,34 @@ public class JWebRequest {
 	Map<String, String> objectsCreated = new HashMap<String, String>();
 
 	public synchronized String registerWinObjectObj(JBaseWin zObject) throws Exception {
-		if (objectsCreated.containsKey(zObject.getUniqueId()))
-			return objectsCreated.get(zObject.getUniqueId());
-		if (isLargeObject(zObject)) {
-			String id = zObject.getUniqueId() != null ? zObject.getUniqueId() : UUID.randomUUID().toString();
-			LARGE_OBJECT_CACHE.put(id, zObject);
-			String out = CACHE_PREFIX + id;
-			getRegisteredObjectsNew().put(id, out);
-			objectsCreated.put(zObject.getUniqueId(), out);
-			return out;
-		}
-		String packed = new JWinPackager(null).baseWinToJSON(zObject);
-		String out = "obj_t_" + packed;
-		objectsCreated.put(zObject.getUniqueId(), out);
-		return out;
+                if (objectsCreated.containsKey(zObject.getUniqueId()))
+                        return objectsCreated.get(zObject.getUniqueId());
+                if (isLargeObject(zObject)) {
+                        String id = zObject.getUniqueId() != null ? zObject.getUniqueId() : UUID.randomUUID().toString();
+                        CacheProvider.get().putBytes(id, serializeObjectToBytes(zObject), CACHE_EXPIRE_SECONDS);
+                        String out = CACHE_PREFIX + id;
+                        getRegisteredObjectsNew().put(id, out);
+                        objectsCreated.put(zObject.getUniqueId(), out);
+                        return out;
+                }
+                String packed = new JWinPackager(null).baseWinToJSON(zObject);
+                String out = "obj_t_" + packed;
+                objectsCreated.put(zObject.getUniqueId(), out);
+                return out;
 	}
 
 	public synchronized String registerRecObjectObj(JBaseRecord zObject) throws Exception {
 		if (zObject == null)
 			return null;
 		String key = zObject.getUniqueId();
-		if (reuseIfPresent(key) != null)
-			return key;
-		if (isLargeObject(zObject)) {
-			LARGE_OBJECT_CACHE.put(key, zObject);
-			getRegisteredObjectsNew().put(key, CACHE_PREFIX + key);
-			return key;
-		}
-		String packed = new JWinPackager(null).baseRecToJSON(zObject);
+                if (reuseIfPresent(key) != null)
+                        return key;
+                if (isLargeObject(zObject)) {
+                        CacheProvider.get().putBytes(key, serializeObjectToBytes(zObject), CACHE_EXPIRE_SECONDS);
+                        getRegisteredObjectsNew().put(key, CACHE_PREFIX + key);
+                        return key;
+                }
+                String packed = new JWinPackager(null).baseRecToJSON(zObject);
 		String payload = "obj_rec_" + packed;
 		getRegisteredObjectsNew().put(key, payload);
 		return key;
@@ -823,15 +818,16 @@ public class JWebRequest {
 			return null;
 		}
 		try {
-			if (obj.startsWith(CACHE_PREFIX)) {
-				return LARGE_OBJECT_CACHE.getIfPresent(obj.substring(CACHE_PREFIX.length()));
-			}
-			if (obj.startsWith("obj_t:")) {
-				return (Serializable) fetchFromCache(obj.substring(6));
-			}
-			if (obj.startsWith("obj_rec:")) {
-				return (Serializable) fetchFromCache(obj.substring(8));
-			}
+                        if (obj.startsWith(CACHE_PREFIX)) {
+                                byte[] data = CacheProvider.get().getBytes(obj.substring(CACHE_PREFIX.length()));
+                                return (Serializable) deserializeObjectFromBytes(data);
+                        }
+                        if (obj.startsWith("obj_t:")) {
+                                return (Serializable) fetchFromCache(obj.substring(6));
+                        }
+                        if (obj.startsWith("obj_rec:")) {
+                                return (Serializable) fetchFromCache(obj.substring(8));
+                        }
 			if (obj.startsWith("obj_t_")) {
 				String payload = obj.substring(6);
 				byte[] raw = JWinPackager.inflate(Base64.getDecoder().decode(payload));
@@ -906,30 +902,27 @@ public class JWebRequest {
 		ReconcileResult rr = reconcileDictionaries(holds);
 		for (String k : rr.evict) {
 			String val = getRegisteredObjectsOld().get(k);
-			if (val != null) {
-				if (val.startsWith(CACHE_PREFIX)) {
-					LARGE_OBJECT_CACHE.invalidate(val.substring(CACHE_PREFIX.length()));
-				} else if (val.startsWith("obj_t:")) {
-					invalidateHandle(val.substring(6));
-				} else if (val.startsWith("obj_rec:")) {
-					invalidateHandle(val.substring(8));
-				}
-			}
+                        if (val != null) {
+                                if (val.startsWith(CACHE_PREFIX)) {
+                                        CacheProvider.get().delete(val.substring(CACHE_PREFIX.length()));
+                                } else if (val.startsWith("obj_t:")) {
+                                        invalidateHandle(val.substring(6));
+                                } else if (val.startsWith("obj_rec:")) {
+                                        invalidateHandle(val.substring(8));
+                                }
+                        }
 		}
 		pack.localHistoryManager = getHistoryManager().serializeHistoryManager();
 		pack.localRegisteredObject = getRegisteredObjectsNew();
 		return serializeRegisterJSON(pack);
 	}
 
-	private void invalidateHandle(String handle) {
-		try {
-			Class<?> clazz = Class.forName("pss.www.platform.cache.Caches");
-			Object big = clazz.getField("BIG").get(null);
-			java.lang.reflect.Method m = big.getClass().getMethod("invalidate", Object.class);
-			m.invoke(big, handle);
-		} catch (Exception e) {
-		}
-	}
+        private void invalidateHandle(String handle) {
+                try {
+                        CacheProvider.get().delete(handle);
+                } catch (Exception e) {
+                }
+        }
 
 	@SuppressWarnings("unchecked")
 	private java.util.List<String> readHoldsFromRequest() throws Exception {
@@ -1050,31 +1043,53 @@ public class JWebRequest {
 		return map;
 	}
 
-	public static String serializeObject(Serializable obj) throws IOException {
-		ByteArrayOutputStream baos = new ByteArrayOutputStream();
-		ObjectOutputStream oos = new ObjectOutputStream(baos);
-		oos.writeObject(obj);
-		oos.close();
-		return Base64.getEncoder().encodeToString(baos.toByteArray());
-	}
+        public static String serializeObject(Serializable obj) throws IOException {
+                ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                ObjectOutputStream oos = new ObjectOutputStream(baos);
+                oos.writeObject(obj);
+                oos.close();
+                return Base64.getEncoder().encodeToString(baos.toByteArray());
+        }
 
-	public static Serializable deserializeObject(String serializedObj) {
-		try {
-			if (serializedObj == null)
-				return null;
-			byte[] data = Base64.getDecoder().decode(serializedObj);
-			ObjectInputStream ois = new ObjectInputStream(new ByteArrayInputStream(data));
-			Serializable obj = (Serializable) ois.readObject();
-			ois.close();
-			return obj;
-		} catch (ClassNotFoundException e) {
-			PssLogger.logError(e);
-			e.printStackTrace();
-		} catch (IOException e) {
-			PssLogger.logError(e);
-		}
-		return null;
-	}
+        public static byte[] serializeObjectToBytes(Serializable obj) throws IOException {
+                ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                ObjectOutputStream oos = new ObjectOutputStream(baos);
+                oos.writeObject(obj);
+                oos.close();
+                return baos.toByteArray();
+        }
+
+        public static Serializable deserializeObject(String serializedObj) {
+                try {
+                        if (serializedObj == null)
+                                return null;
+                        byte[] data = Base64.getDecoder().decode(serializedObj);
+                        ObjectInputStream ois = new ObjectInputStream(new ByteArrayInputStream(data));
+                        Serializable obj = (Serializable) ois.readObject();
+                        ois.close();
+                        return obj;
+                } catch (ClassNotFoundException e) {
+                        PssLogger.logError(e);
+                        e.printStackTrace();
+                } catch (IOException e) {
+                        PssLogger.logError(e);
+                }
+                return null;
+        }
+
+        public static Serializable deserializeObjectFromBytes(byte[] data) {
+                if (data == null)
+                        return null;
+                try {
+                        ObjectInputStream ois = new ObjectInputStream(new ByteArrayInputStream(data));
+                        Serializable obj = (Serializable) ois.readObject();
+                        ois.close();
+                        return obj;
+                } catch (Exception e) {
+                        PssLogger.logError(e);
+                        return null;
+                }
+        }
 
 	public static String baseWinToSession(JBaseWin zOwner) throws Exception {
 //	  if (!zOwner.canConvertToURL()) return serializeObject(zOwner);

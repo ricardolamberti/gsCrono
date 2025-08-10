@@ -30,7 +30,8 @@ import pss.www.platform.actions.requestBundle.JWebActionDataField;
 import pss.www.platform.applications.JHistory;
 import pss.www.platform.applications.JHistoryProvider;
 import pss.www.platform.applications.JWebHistoryManager;
-import pss.www.platform.cache.PackCaches;
+import pss.www.platform.cache.CacheProvider;
+import pss.www.platform.cache.DistCache;
 
 public class JWebWinFactory {
 
@@ -844,40 +845,34 @@ public class JWebWinFactory {
 		return rec.getUniqueId() + "|" + rec.GetVision() + "|" + readed + "|" + filters;
 	}
 
-	public String baseWinToURL(JBaseWin zOwner) throws Exception {
-		final String key = "win:" + winStamp(zOwner);
-		return PackCaches.WIN_PACK.get(key, new java.util.function.Function<String, String>() {
-			@Override
-			public String apply(String k) {
-				try {
-					return packager.baseWinToPack(zOwner);
-				} catch (Exception e) {
-					throw new RuntimeException(e);
-				}
-			}
-		});
-	}
+        public String baseWinToURL(JBaseWin zOwner) throws Exception {
+                final String key = "win:" + winStamp(zOwner);
+                DistCache cache = CacheProvider.get();
+                byte[] cached = cache.getBytes(key);
+                if (cached != null)
+                        return JTools.byteVectorToString(cached);
+                String packed = packager.baseWinToPack(zOwner);
+                cache.putBytes(key, JTools.stringToByteArray(packed), 0);
+                return packed;
+        }
 
-	public String baseRecToURL(JBaseRecord rec) throws Exception {
-		final String key = "rec:" + recStamp(rec);
-		return PackCaches.REC_PACK.get(key, new java.util.function.Function<String, String>() {
-			@Override
-			public String apply(String k) {
-				try {
-					return packager.baseRecToPack(rec);
-				} catch (Exception e) {
-					throw new RuntimeException(e);
-				}
-			}
-		});
-	}
+        public String baseRecToURL(JBaseRecord rec) throws Exception {
+                final String key = "rec:" + recStamp(rec);
+                DistCache cache = CacheProvider.get();
+                byte[] cached = cache.getBytes(key);
+                if (cached != null)
+                        return JTools.byteVectorToString(cached);
+                String packed = packager.baseRecToPack(rec);
+                cache.putBytes(key, JTools.stringToByteArray(packed), 0);
+                return packed;
+        }
 
-	public void invalidateWinPack(JBaseWin win) throws Exception {
-		PackCaches.invalidateWinKey("win:" + winStamp(win));
-	}
+        public void invalidateWinPack(JBaseWin win) throws Exception {
+                CacheProvider.get().delete("win:" + winStamp(win));
+        }
 
-	public void invalidateRecPack(JBaseRecord rec) throws Exception {
-		PackCaches.invalidateRecKey("rec:" + recStamp(rec));
-	}
+        public void invalidateRecPack(JBaseRecord rec) throws Exception {
+                CacheProvider.get().delete("rec:" + recStamp(rec));
+        }
 
 }

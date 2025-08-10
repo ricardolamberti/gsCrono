@@ -11,13 +11,10 @@ import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 import java.util.zip.Deflater;
 import java.util.zip.Inflater;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.benmanes.caffeine.cache.Cache;
-import com.github.benmanes.caffeine.cache.Caffeine;
 
 import pss.core.data.interfaces.structure.RFilter;
 import pss.core.services.fields.JObject;
@@ -31,15 +28,12 @@ import pss.core.tools.collections.JMap;
 import pss.core.win.JBaseWin;
 import pss.core.win.JWin;
 import pss.core.win.submits.JAct;
+import pss.www.platform.cache.CacheProvider;
 
 public class JWinPackager {
 
     private final JWebWinFactory factory;
     private final ObjectMapper objectMapper = new ObjectMapper();
-    private static final Cache<String, String> SERIALIZATION_CACHE = Caffeine.newBuilder()
-            .maximumSize(1000)
-            .expireAfterAccess(10, TimeUnit.MINUTES)
-            .build();
 
     public static String b64url(byte[] data) {
         return Base64.getUrlEncoder().withoutPadding().encodeToString(data);
@@ -143,23 +137,33 @@ public class JWinPackager {
 
     public String baseWinToJSON(JBaseWin win) throws Exception {
         String key = win.getUniqueId() + "_win";
-        String cached = SERIALIZATION_CACHE.getIfPresent(key);
+        String cached = null;
+        try {
+            byte[] data = CacheProvider.get().getBytes(key);
+            if (data != null)
+                cached = JTools.byteVectorToString(data);
+        } catch (Exception ignore) {}
         if (cached != null)
             return cached;
         String json = serializeWinToJson(win);
         String encoded = Base64.getEncoder().encodeToString(deflate(json.getBytes(StandardCharsets.UTF_8)));
-        SERIALIZATION_CACHE.put(key, encoded);
+        CacheProvider.get().putBytes(key, JTools.stringToByteArray(encoded), 0);
         return encoded;
     }
 
     public String baseRecToJSON(JBaseRecord rec) throws Exception {
         String key = rec.getUniqueId() + "_rec";
-        String cached = SERIALIZATION_CACHE.getIfPresent(key);
+        String cached = null;
+        try {
+            byte[] data = CacheProvider.get().getBytes(key);
+            if (data != null)
+                cached = JTools.byteVectorToString(data);
+        } catch (Exception ignore) {}
         if (cached != null)
             return cached;
         String json = serializeRecToJson(rec);
         String encoded = Base64.getEncoder().encodeToString(deflate(json.getBytes(StandardCharsets.UTF_8)));
-        SERIALIZATION_CACHE.put(key, encoded);
+        CacheProvider.get().putBytes(key, JTools.stringToByteArray(encoded), 0);
         return encoded;
     }
 
