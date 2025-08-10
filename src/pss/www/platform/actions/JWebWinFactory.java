@@ -285,7 +285,6 @@ public class JWebWinFactory {
 		return null;
 	}
 
-
 	private boolean okFilter(JBaseRecord baseRec, String filter) throws Exception {
 		if (!(baseRec instanceof JRecord))
 			return true;
@@ -736,9 +735,9 @@ public class JWebWinFactory {
 
 	}
 
-        public BizAction convertURLToAction(String sAction) throws Exception {
-                Map<String, String> dict = JWebActionFactory.getCurrentRequest().deserializeRegisterMapJSON(sAction);
-                BizAction action;
+	public BizAction convertURLToAction(String sAction) throws Exception {
+		Map<String, String> dict = JWebActionFactory.getCurrentRequest().deserializeRegisterMapJSON(sAction);
+		BizAction action;
 		if (dict.containsKey("a") || dict.containsKey("action")) {
 			String data = dict.containsKey("a") ? dict.get("a") : dict.get("action");
 			byte[] bytes;
@@ -759,130 +758,124 @@ public class JWebWinFactory {
 				action.getObjSubmit().setResult(result);
 			}
 		}
-                return action;
-        }
+		return action;
+	}
 
-        private String winStamp(JBaseWin win) throws Exception {
-                boolean readed = win.isWin() && ((JWin) win).getRecord().wasDbRead();
-                int filters = win.GetBaseDato().getFilters() != null ? win.GetBaseDato().getFilters().size() : 0;
-                return win.getUniqueId() + "|" + win.GetVision() + "|" + readed + "|" + filters;
-        }
+	private String winStamp(JBaseWin win) throws Exception {
+		boolean readed = win.isWin() && ((JWin) win).getRecord().wasDbRead();
+		int filters = win.GetBaseDato().getFilters() != null ? win.GetBaseDato().getFilters().size() : 0;
+		return win.getUniqueId() + "|" + win.GetVision() + "|" + readed + "|" + filters;
+	}
 
-        private String recStamp(JBaseRecord rec) throws Exception {
-                boolean readed = (rec instanceof JRecord) && ((JRecord) rec).wasDbRead();
-                int filters = rec.getFilters() != null ? rec.getFilters().size() : 0;
-                return rec.getUniqueId() + "|" + rec.GetVision() + "|" + readed + "|" + filters;
-        }
+	private String recStamp(JBaseRecord rec) throws Exception {
+		boolean readed = (rec instanceof JRecord) && ((JRecord) rec).wasDbRead();
+		int filters = rec.getFilters() != null ? rec.getFilters().size() : 0;
+		return rec.getUniqueId() + "|" + rec.GetVision() + "|" + readed + "|" + filters;
+	}
 
-        public String baseWinToURL(JBaseWin zOwner) throws Exception {
-                final String key = "win:" + winStamp(zOwner);
-                return PackCaches.WIN_PACK.get(key, new java.util.function.Function<String, String>() {
-                        @Override
-                        public String apply(String k) {
-                                try {
-                                        return baseWinToPack(zOwner);
-                                } catch (Exception e) {
-                                        throw new RuntimeException(e);
-                                }
-                        }
-                });
-        }
+	public String baseWinToURL(JBaseWin zOwner) throws Exception {
+		final String key = "win:" + winStamp(zOwner);
+		return PackCaches.WIN_PACK.get(key, new java.util.function.Function<String, String>() {
+			@Override
+			public String apply(String k) {
+				try {
+					return baseWinToPack(zOwner);
+				} catch (Exception e) {
+					throw new RuntimeException(e);
+				}
+			}
+		});
+	}
 
-        public String baseRecToURL(JBaseRecord rec) throws Exception {
-                final String key = "rec:" + recStamp(rec);
-                return PackCaches.REC_PACK.get(key, new java.util.function.Function<String, String>() {
-                        @Override
-                        public String apply(String k) {
-                                try {
-                                        return baseRecToPack(rec);
-                                } catch (Exception e) {
-                                        throw new RuntimeException(e);
-                                }
-                        }
-                });
-        }
+	public String baseRecToURL(JBaseRecord rec) throws Exception {
+		final String key = "rec:" + recStamp(rec);
+		return PackCaches.REC_PACK.get(key, new java.util.function.Function<String, String>() {
+			@Override
+			public String apply(String k) {
+				try {
+					return baseRecToPack(rec);
+				} catch (Exception e) {
+					throw new RuntimeException(e);
+				}
+			}
+		});
+	}
 
-        public void invalidateWinPack(JBaseWin win) throws Exception {
-                PackCaches.invalidateWinKey("win:" + winStamp(win));
-        }
+	public void invalidateWinPack(JBaseWin win) throws Exception {
+		PackCaches.invalidateWinKey("win:" + winStamp(win));
+	}
 
-        public void invalidateRecPack(JBaseRecord rec) throws Exception {
-                PackCaches.invalidateRecKey("rec:" + recStamp(rec));
-        }
+	public void invalidateRecPack(JBaseRecord rec) throws Exception {
+		PackCaches.invalidateRecKey("rec:" + recStamp(rec));
+	}
 
+	private final ObjectMapper objectMapper = new ObjectMapper();
+	private static final Cache<String, String> SERIALIZATION_CACHE = Caffeine.newBuilder().maximumSize(1000).expireAfterAccess(10, TimeUnit.MINUTES).build();
 
-        private final ObjectMapper objectMapper = new ObjectMapper();
-        private static final Cache<String, String> SERIALIZATION_CACHE = Caffeine.newBuilder()
-                        .maximumSize(1000)
-                        .expireAfterAccess(10, TimeUnit.MINUTES)
-                        .build();
+	private String serializeWinToJson(JBaseWin win) throws Exception {
+		JSerializableBaseWin serializableWin = prepareSerializableWin(win);
+		return objectMapper.writeValueAsString(serializableWin);
+	}
 
-        private String serializeWinToJson(JBaseWin win) throws Exception {
-                JSerializableBaseWin serializableWin = prepareSerializableWin(win);
-                return objectMapper.writeValueAsString(serializableWin);
-        }
+	private String serializeRecToJson(JBaseRecord rec) throws Exception {
+		JSerializableBaseWin serializableWin = prepareSerializableRec(rec, false);
+		return objectMapper.writeValueAsString(serializableWin);
+	}
 
-        private String serializeRecToJson(JBaseRecord rec) throws Exception {
-                JSerializableBaseWin serializableWin = prepareSerializableRec(rec, false);
-                return objectMapper.writeValueAsString(serializableWin);
-        }
+	// Serializar JBaseWin y JBaseRecord a JSON comprimido Base64
 
-        // Serializar JBaseWin y JBaseRecord a JSON comprimido Base64
+	public String baseWinToJSON(JBaseWin win) throws Exception {
+		String key = win.getUniqueId() + "_win";
+		String cached = SERIALIZATION_CACHE.getIfPresent(key);
+		if (cached != null)
+			return cached;
+		String json = serializeWinToJson(win);
+		String encoded = Base64.getEncoder().encodeToString(compress(json.getBytes(StandardCharsets.UTF_8)));
+		SERIALIZATION_CACHE.put(key, encoded);
+		return encoded;
+	}
 
-        public String baseWinToJSON(JBaseWin win) throws Exception {
-                String key = win.getUniqueId() + "_win";
-                String cached = SERIALIZATION_CACHE.getIfPresent(key);
-                if (cached != null)
-                        return cached;
-                String json = serializeWinToJson(win);
-                String encoded = Base64.getEncoder()
-                                .encodeToString(compress(json.getBytes(StandardCharsets.UTF_8)));
-                SERIALIZATION_CACHE.put(key, encoded);
-                return encoded;
-        }
+	public String baseRecToJSON(JBaseRecord rec) throws Exception {
+		String key = rec.getUniqueId() + "_rec";
+		String cached = SERIALIZATION_CACHE.getIfPresent(key);
+		if (cached != null)
+			return cached;
+		String json = serializeRecToJson(rec);
+		String encoded = Base64.getEncoder().encodeToString(compress(json.getBytes(StandardCharsets.UTF_8)));
+		SERIALIZATION_CACHE.put(key, encoded);
+		return encoded;
+	}
 
-        public String baseRecToJSON(JBaseRecord rec) throws Exception {
-                String key = rec.getUniqueId() + "_rec";
-                String cached = SERIALIZATION_CACHE.getIfPresent(key);
-                if (cached != null)
-                        return cached;
-                String json = serializeRecToJson(rec);
-                String encoded = Base64.getEncoder()
-                                .encodeToString(compress(json.getBytes(StandardCharsets.UTF_8)));
-                SERIALIZATION_CACHE.put(key, encoded);
-                return encoded;
-        }
+	private static byte[] compress(byte[] data) throws IOException {
+		Deflater deflater = new Deflater(Deflater.BEST_COMPRESSION);
+		deflater.setInput(data);
+		deflater.finish();
+		try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
+			byte[] buffer = new byte[1024];
+			while (!deflater.finished()) {
+				int count = deflater.deflate(buffer);
+				baos.write(buffer, 0, count);
+			}
+			return baos.toByteArray();
+		} finally {
+			deflater.end();
+		}
+	}
 
-        private static byte[] compress(byte[] data) throws IOException {
-                Deflater deflater = new Deflater(Deflater.BEST_COMPRESSION);
-                deflater.setInput(data);
-                deflater.finish();
-                try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
-                        byte[] buffer = new byte[1024];
-                        while (!deflater.finished()) {
-                                int count = deflater.deflate(buffer);
-                                baos.write(buffer, 0, count);
-                        }
-                        return baos.toByteArray();
-                } finally {
-                        deflater.end();
-                }
-        }
-
-        private static byte[] decompress(byte[] data) throws IOException, DataFormatException {
-                Inflater inflater = new Inflater();
-                inflater.setInput(data);
-                try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
-                        byte[] buffer = new byte[1024];
-                        while (!inflater.finished()) {
-                                int count = inflater.inflate(buffer);
-                                baos.write(buffer, 0, count);
-                        }
-                        return baos.toByteArray();
-                } finally {
-                        inflater.end();
-                }
-        }
+	private static byte[] decompress(byte[] data) throws IOException, DataFormatException {
+		Inflater inflater = new Inflater();
+		inflater.setInput(data);
+		try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
+			byte[] buffer = new byte[1024];
+			while (!inflater.finished()) {
+				int count = inflater.inflate(buffer);
+				baos.write(buffer, 0, count);
+			}
+			return baos.toByteArray();
+		} finally {
+			inflater.end();
+		}
+	}
 
 	private static String packJson(String json) throws Exception {
 		byte[] raw = JTools.stringToByteArray(json);
@@ -894,14 +887,14 @@ public class JWebWinFactory {
 		return JTools.byteVectorToString(raw);
 	}
 
-        // helpers públicos para wins/records
-        public String baseWinToPack(JBaseWin win) throws Exception {
-                return packJson(serializeWinToJson(win));
-        }
+	// helpers públicos para wins/records
+	public String baseWinToPack(JBaseWin win) throws Exception {
+		return packJson(serializeWinToJson(win));
+	}
 
-        public String baseRecToPack(JBaseRecord rec) throws Exception {
-                return packJson(serializeRecToJson(rec));
-        }
+	public String baseRecToPack(JBaseRecord rec) throws Exception {
+		return packJson(serializeRecToJson(rec));
+	}
 
 	public JBaseWin jsonToBaseWin(String json) throws Exception {
 		return createWinFromJson(json, null);
@@ -958,28 +951,29 @@ public class JWebWinFactory {
 		return actionOwner;
 	}
 
-        // Compatibilidad con datos antiguos: intentar descomprimir y luego interpretar como JSON
-        public JBaseWin createWin(String encoded, String id) throws Exception {
-                byte[] decoded = Base64.getDecoder().decode(encoded);
-                String json;
-                try {
-                        json = new String(decompress(decoded), StandardCharsets.UTF_8);
-                } catch (DataFormatException e) {
-                        json = new String(decoded, StandardCharsets.UTF_8);
-                }
-                return createWinFromJson(json, id);
-        }
+	// Compatibilidad con datos antiguos: intentar descomprimir y luego interpretar
+	// como JSON
+	public JBaseWin createWin(String encoded, String id) throws Exception {
+		byte[] decoded = Base64.getDecoder().decode(encoded);
+		String json;
+		try {
+			json = new String(decompress(decoded), StandardCharsets.UTF_8);
+		} catch (DataFormatException e) {
+			json = new String(decoded, StandardCharsets.UTF_8);
+		}
+		return createWinFromJson(json, id);
+	}
 
-        public JBaseRecord createRec(String encoded, String id) throws Exception {
-                byte[] decoded = Base64.getDecoder().decode(encoded);
-                String json;
-                try {
-                        json = new String(decompress(decoded), StandardCharsets.UTF_8);
-                } catch (DataFormatException e) {
-                        json = new String(decoded, StandardCharsets.UTF_8);
-                }
-                return createRecFromJson(json, id);
-        }
+	public JBaseRecord createRec(String encoded, String id) throws Exception {
+		byte[] decoded = Base64.getDecoder().decode(encoded);
+		String json;
+		try {
+			json = new String(decompress(decoded), StandardCharsets.UTF_8);
+		} catch (DataFormatException e) {
+			json = new String(decoded, StandardCharsets.UTF_8);
+		}
+		return createRecFromJson(json, id);
+	}
 
 	private void asaignElements(JSerializableBaseWin serializableWin, JBaseRecord actionOwner) throws Exception {
 		if (!(actionOwner instanceof JRecords) || serializableWin.elements == null)
