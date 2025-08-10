@@ -15,6 +15,7 @@ import java.util.StringTokenizer;
 import java.util.TreeMap;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import pss.www.platform.cache.PackCaches;
 
 import pss.core.data.interfaces.structure.RFilter;
 import pss.core.services.fields.JObjBDs;
@@ -817,9 +818,9 @@ public class JWebWinFactory {
 
 	}
 
-	public BizAction convertURLToAction(String sAction) throws Exception {
-		Map<String, String> dict = JWebActionFactory.getCurrentRequest().deserializeRegisterMapJSON(sAction);
-		BizAction action;
+        public BizAction convertURLToAction(String sAction) throws Exception {
+                Map<String, String> dict = JWebActionFactory.getCurrentRequest().deserializeRegisterMapJSON(sAction);
+                BizAction action;
 		if (dict.containsKey("a") || dict.containsKey("action")) {
 			String data = dict.containsKey("a") ? dict.get("a") : dict.get("action");
 			byte[] bytes;
@@ -840,12 +841,56 @@ public class JWebWinFactory {
 				action.getObjSubmit().setResult(result);
 			}
 		}
-		return action;
-	}
+                return action;
+        }
 
-	public String baseWinToURL(JBaseWin zOwner) throws Exception {
-		return baseWinToPack(zOwner); // b64url(deflate(JSON))
-	}
+        private String winStamp(JBaseWin win) throws Exception {
+                boolean readed = win.isWin() && ((JWin) win).getRecord().wasDbRead();
+                int filters = win.GetBaseDato().getFilters() != null ? win.GetBaseDato().getFilters().size() : 0;
+                return win.getUniqueId() + "|" + win.GetVision() + "|" + readed + "|" + filters;
+        }
+
+        private String recStamp(JBaseRecord rec) throws Exception {
+                boolean readed = (rec instanceof JRecord) && ((JRecord) rec).wasDbRead();
+                int filters = rec.getFilters() != null ? rec.getFilters().size() : 0;
+                return rec.getUniqueId() + "|" + rec.GetVision() + "|" + readed + "|" + filters;
+        }
+
+        public String baseWinToURL(JBaseWin zOwner) throws Exception {
+                final String key = "win:" + winStamp(zOwner);
+                return PackCaches.WIN_PACK.get(key, new java.util.function.Function<String, String>() {
+                        @Override
+                        public String apply(String k) {
+                                try {
+                                        return baseWinToPack(zOwner);
+                                } catch (Exception e) {
+                                        throw new RuntimeException(e);
+                                }
+                        }
+                });
+        }
+
+        public String baseRecToURL(JBaseRecord rec) throws Exception {
+                final String key = "rec:" + recStamp(rec);
+                return PackCaches.REC_PACK.get(key, new java.util.function.Function<String, String>() {
+                        @Override
+                        public String apply(String k) {
+                                try {
+                                        return baseRecToPack(rec);
+                                } catch (Exception e) {
+                                        throw new RuntimeException(e);
+                                }
+                        }
+                });
+        }
+
+        public void invalidateWinPack(JBaseWin win) throws Exception {
+                PackCaches.invalidateWinKey("win:" + winStamp(win));
+        }
+
+        public void invalidateRecPack(JBaseRecord rec) throws Exception {
+                PackCaches.invalidateRecKey("rec:" + recStamp(rec));
+        }
 
 //
 //		JWebActionData oData = new JWebActionData("");
