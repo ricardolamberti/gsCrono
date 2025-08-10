@@ -40,7 +40,7 @@ public class MemcachedDistCache implements DistCache, AutoCloseable {
     @Override
     public void close() {
         try {
-            client.shutdown(opTimeoutMs);
+            client.shutdown();
         } catch (Exception ignore) {
         }
     }

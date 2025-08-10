@@ -781,12 +781,12 @@ public class BizPssConfig {
     // ---------------------------------------------------------------------
     // Cache replication configuration
 
-    private static String getPropEnvOrIni(String key, String def) {
+    private static String getPropEnvOrIni(String folder,String key, String def) {
         String v = System.getProperty(key);
         if (v == null) v = System.getenv(key.replace('.', '_').toUpperCase());
         if (v == null) {
             try {
-                v = BizPssConfig.getPssConfig().getCachedValue("GENERAL", key, null);
+                v = BizPssConfig.getPssConfig().getCachedValue(folder, key, null);
             } catch (Exception e) {
                 v = null;
             }
@@ -795,23 +795,23 @@ public class BizPssConfig {
     }
 
     public static boolean isCacheReplicationEnabled() {
-        return Boolean.parseBoolean(getPropEnvOrIni("pss.cache.replication.enabled", "false"));
+        return Boolean.parseBoolean(getPropEnvOrIni("CACHE","pss.cache.replication.enabled", "false"));
     }
 
     public static String getMemcachedHost() {
-        return getPropEnvOrIni("pss.cache.memcached.host", "localhost");
+        return getPropEnvOrIni("CACHE","pss.cache.memcached.host", "localhost");
     }
 
     public static int getMemcachedPort() {
-        return Integer.parseInt(getPropEnvOrIni("pss.cache.memcached.port", "11211"));
+        return Integer.parseInt(getPropEnvOrIni("CACHE","pss.cache.memcached.port", "11211"));
     }
 
     public static int getMemcachedDefaultTtlSeconds() {
-        return Integer.parseInt(getPropEnvOrIni("pss.cache.memcached.ttl.default.seconds", "3600"));
+        return Integer.parseInt(getPropEnvOrIni("CACHE","pss.cache.memcached.ttl.default.seconds", "3600"));
     }
 
     public static int getMemcachedTimeoutMs() {
-        return Integer.parseInt(getPropEnvOrIni("pss.cache.memcached.timeout.ms", "100"));
+        return Integer.parseInt(getPropEnvOrIni("CACHE","pss.cache.memcached.timeout.ms", "100"));
     }
 
 }

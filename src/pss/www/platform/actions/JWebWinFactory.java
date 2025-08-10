@@ -772,66 +772,61 @@ public class JWebWinFactory {
 	}
 
 	public String convertActionToURL(BizAction zAction) throws Exception {
-    Map<String, String> dict = new HashMap<>();
-    String id = zAction.getIdAction();
-    if (id != null) dict.put("i", id);
+		Map<String, String> dict = new HashMap<>();
+		String id = zAction.getIdAction();
+		if (id != null)
+			dict.put("i", id);
 
-    if (zAction.needsFullSerialization()) {
-        byte[] serialized = JTools.stringToByteVector(
-            JWebActionFactory.getCurrentRequest().serializeObject(zAction)
-        );
-        dict.put("a", JWinPackager.b64url(JWinPackager.deflate(serialized)));
-    } else {
-        // pack in
-       // JWinPackager packer = new JWinPackager(null);
-        String idOwner = JWebActionFactory.getCurrentRequest().registerObjectObj(zAction.getObjOwner());
-        if (idOwner != null && !idOwner.isEmpty()) {
-            dict.put("o", idOwner);
-        }
+		if (zAction.needsFullSerialization()) {
+			byte[] serialized = JTools.stringToByteVector(JWebActionFactory.getCurrentRequest().serializeObject(zAction));
+			dict.put("a", JWinPackager.b64url(JWinPackager.deflate(serialized)));
+		} else {
+			// pack in
+			// JWinPackager packer = new JWinPackager(null);
+			String idOwner = JWebActionFactory.getCurrentRequest().registerObjectObj(zAction.getObjOwner());
+			if (idOwner != null && !idOwner.isEmpty()) {
+				dict.put("o", idOwner);
+			}
 
-        if (zAction.hasSubmit()) {
-            JAct submit = zAction.getObjSubmit();
-            if (submit != null && submit.hasResult()) {
-              String idResult = JWebActionFactory.getCurrentRequest().registerObjectObj(zAction.getObjOwner());
-                //String resultPacked = packer.baseWinToPack(submit.getResult());
-              if (idResult != null && !idResult.isEmpty()) {
-                  dict.put("r", idResult);
-              }
-            }
-        }
-    }
-    return JWebActionFactory.getCurrentRequest().serializeRegisterMapJSON(dict);
-}
-
+			if (zAction.hasSubmit()) {
+				JAct submit = zAction.getObjSubmit();
+				if (submit != null && submit.hasResult()) {
+					String idResult = JWebActionFactory.getCurrentRequest().registerObjectObj(zAction.getObjOwner());
+					// String resultPacked = packer.baseWinToPack(submit.getResult());
+					if (idResult != null && !idResult.isEmpty()) {
+						dict.put("r", idResult);
+					}
+				}
+			}
+		}
+		return JWebActionFactory.getCurrentRequest().serializeRegisterMapJSON(dict);
+	}
 
 	public BizAction convertURLToAction(String sAction) throws Exception {
-    Map<String, String> dict = JWebActionFactory.getCurrentRequest().deserializeRegisterMapJSON(sAction);
-    BizAction action;
+		Map<String, String> dict = JWebActionFactory.getCurrentRequest().deserializeRegisterMapJSON(sAction);
+		BizAction action;
 
-    if (dict.containsKey("ay") || dict.containsKey("action")) {
-        String data = dict.containsKey("a") ? dict.get("a") : dict.get("action");
-        byte[] bytes = dict.containsKey("a")
-            ? JWinPackager.inflate(JWinPackager.b64urlDecode(data))
-            : Base64.getDecoder().decode(data);
-        action = (BizAction) JWebActionFactory.getCurrentRequest().deserializeObject(JTools.byteVectorToString(bytes));
-    } else {
- 
-        String ownerKey = dict.containsKey("o") ? dict.get("o") : dict.get("owner");
-        String id      = dict.containsKey("i") ? dict.get("i") : dict.get("actionid");
+		if (dict.containsKey("ay") || dict.containsKey("action")) {
+			String data = dict.containsKey("a") ? dict.get("a") : dict.get("action");
+			byte[] bytes = dict.containsKey("a") ? JWinPackager.inflate(JWinPackager.b64urlDecode(data)) : Base64.getDecoder().decode(data);
+			action = (BizAction) JWebActionFactory.getCurrentRequest().deserializeObject(JTools.byteVectorToString(bytes));
+		} else {
 
-        JBaseWin win =  (JBaseWin)JWebActionFactory.getCurrentRequest().getRegisterObject(ownerKey);
-     
-        action = win.findActionByUniqueId(id);
+			String ownerKey = dict.containsKey("o") ? dict.get("o") : dict.get("owner");
+			String id = dict.containsKey("i") ? dict.get("i") : dict.get("actionid");
 
-        String resultKey = dict.containsKey("r") ? dict.get("r") : dict.get("result");
-        if (resultKey != null) {
-            JBaseWin result =  (JBaseWin)JWebActionFactory.getCurrentRequest().getRegisterObject(resultKey);
-            action.getObjSubmit().setResult(result);
-        }
-    }
-    return action;
-}
+			JBaseWin win = (JBaseWin) JWebActionFactory.getCurrentRequest().getRegisterObject(ownerKey);
 
+			action = win.findActionByUniqueId(id);
+
+			String resultKey = dict.containsKey("r") ? dict.get("r") : dict.get("result");
+			if (resultKey != null) {
+				JBaseWin result = (JBaseWin) JWebActionFactory.getCurrentRequest().getRegisterObject(resultKey);
+				action.getObjSubmit().setResult(result);
+			}
+		}
+		return action;
+	}
 
 	private String winStamp(JBaseWin win) throws Exception {
 		boolean readed = win.isWin() && ((JWin) win).getRecord().wasDbRead();
@@ -845,34 +840,34 @@ public class JWebWinFactory {
 		return rec.getUniqueId() + "|" + rec.GetVision() + "|" + readed + "|" + filters;
 	}
 
-        public String baseWinToURL(JBaseWin zOwner) throws Exception {
-                final String key = "win:" + winStamp(zOwner);
-                DistCache cache = CacheProvider.get();
-                byte[] cached = cache.getBytes(key);
-                if (cached != null)
-                        return JTools.byteVectorToString(cached);
-                String packed = packager.baseWinToPack(zOwner);
-                cache.putBytes(key, JTools.stringToByteArray(packed), 0);
-                return packed;
-        }
+	public String baseWinToURL(JBaseWin zOwner) throws Exception {
+		final String key = "win:" + winStamp(zOwner);
+		DistCache cache = CacheProvider.get();
+		byte[] cached = cache.getBytes(key);
+		if (cached != null)
+			return JTools.byteVectorToString(cached);
+		String packed = packager.baseWinToPack(zOwner);
+		cache.putBytes(key, JTools.stringToByteArray(packed), 0);
+		return packed;
+	}
 
-        public String baseRecToURL(JBaseRecord rec) throws Exception {
-                final String key = "rec:" + recStamp(rec);
-                DistCache cache = CacheProvider.get();
-                byte[] cached = cache.getBytes(key);
-                if (cached != null)
-                        return JTools.byteVectorToString(cached);
-                String packed = packager.baseRecToPack(rec);
-                cache.putBytes(key, JTools.stringToByteArray(packed), 0);
-                return packed;
-        }
+	public String baseRecToURL(JBaseRecord rec) throws Exception {
+		final String key = "rec:" + recStamp(rec);
+		DistCache cache = CacheProvider.get();
+		byte[] cached = cache.getBytes(key);
+		if (cached != null)
+			return JTools.byteVectorToString(cached);
+		String packed = packager.baseRecToPack(rec);
+		cache.putBytes(key, JTools.stringToByteArray(packed), 0);
+		return packed;
+	}
 
-        public void invalidateWinPack(JBaseWin win) throws Exception {
-                CacheProvider.get().delete("win:" + winStamp(win));
-        }
+	public void invalidateWinPack(JBaseWin win) throws Exception {
+		CacheProvider.get().delete("win:" + winStamp(win));
+	}
 
-        public void invalidateRecPack(JBaseRecord rec) throws Exception {
-                CacheProvider.get().delete("rec:" + recStamp(rec));
-        }
+	public void invalidateRecPack(JBaseRecord rec) throws Exception {
+		CacheProvider.get().delete("rec:" + recStamp(rec));
+	}
 
 }
