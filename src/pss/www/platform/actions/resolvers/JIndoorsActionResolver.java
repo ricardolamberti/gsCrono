@@ -20,9 +20,7 @@ import org.apache.cocoon.environment.SourceResolver;
 import org.apache.cocoon.environment.http.HttpRequest;
 import org.apache.cocoon.environment.http.HttpResponse;
 
-import iText.lowagie.text.ExceptionConverter;
 import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
 import pss.core.services.records.JFilterMap;
 import pss.core.tools.collections.JCollectionFactory;
 import pss.core.tools.collections.JIterator;

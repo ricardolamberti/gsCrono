@@ -7,7 +7,6 @@
 package pss.www.platform.actions;
 
 import java.io.Serializable;
-import java.util.Base64;
 
 import org.apache.commons.codec.EncoderException;
 import org.apache.commons.codec.net.URLCodec;
@@ -15,8 +14,6 @@ import org.apache.commons.codec.net.URLCodec;
 import pss.common.mail.GuiModuloMailing;
 import pss.common.security.BizUsuario;
 import pss.common.security.GuiModuloSeguridad;
-import pss.core.data.interfaces.structure.RFilter;
-import pss.core.services.fields.JObject;
 import pss.core.tools.JDateTools;
 import pss.core.tools.JExcepcion;
 import pss.core.tools.JExceptionRunAction;
@@ -24,11 +21,8 @@ import pss.core.tools.JTools;
 import pss.core.tools.PssLogger;
 import pss.core.tools.collections.JCollectionFactory;
 import pss.core.tools.collections.JIterator;
-import pss.core.tools.collections.JList;
-import pss.core.tools.collections.JMap;
 import pss.core.tools.collections.JStringTokenizer;
 import pss.core.win.JBaseWin;
-import pss.core.win.JWin;
 import pss.core.win.actions.BizAction;
 import pss.www.GuiModuloWebUserProfile;
 import pss.www.platform.actions.requestBundle.JWebActionData;

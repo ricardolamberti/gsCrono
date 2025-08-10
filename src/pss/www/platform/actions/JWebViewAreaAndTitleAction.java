@@ -6,8 +6,6 @@
 
 package pss.www.platform.actions;
 
-import pss.core.data.BizPssConfig;
-
 public class JWebViewAreaAndTitleAction extends JWebServerAction {
 
   JWebViewAreaAndTitleAction(boolean zIsSubmit) {

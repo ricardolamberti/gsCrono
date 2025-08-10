@@ -9,7 +9,6 @@ package pss.www.platform.actions.resolvers;
 import pss.core.win.JBaseWin;
 import pss.core.win.JWins;
 import pss.core.win.actions.BizAction;
-import pss.www.platform.actions.requestBundle.JWebActionData;
 import pss.www.platform.applications.JHistoryProvider;
 
 

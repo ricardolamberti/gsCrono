@@ -19,7 +19,6 @@ import pss.www.platform.actions.requestBundle.JWebActionDataBundle;
 import pss.www.platform.content.generators.JXMLContent;
 import pss.www.ui.JWebActionOwnerProvider;
 import pss.www.ui.JWebFilterPaneResponsive;
-import pss.www.ui.JWebFilterPanel;
 import pss.www.ui.JWebWinGenericResponsive;
 
 

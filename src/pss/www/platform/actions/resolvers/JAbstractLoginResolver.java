@@ -21,7 +21,6 @@ import pss.common.security.ExpiredPasswordException;
 import pss.common.security.WrongPasswordException;
 import pss.core.JAplicacion;
 import pss.core.data.BizPssConfig;
-import pss.core.data.interfaces.connections.JBDatos;
 import pss.core.tools.collections.JMap;
 import pss.www.platform.actions.results.JWebActionResult;
 import pss.www.platform.applications.JWebApplication;
