@@ -803,7 +803,7 @@ public class JWebRequest {
 		}
                if (objectsCreated.containsKey(zObject.getUniqueId()))
                        return objectsCreated.get(zObject.getUniqueId());
-               String packed = new JWebWinFactory(null).baseWinToJSON(zObject);
+               String packed = new JWinPackager(null).baseWinToJSON(zObject);
                String out = "obj_t_" + packed;
                objectsCreated.put(zObject.getUniqueId(), out);
                return out;
@@ -820,7 +820,7 @@ public class JWebRequest {
 			getRegisteredObjectsNew().put(key, CACHE_PREFIX + key);
 			return key;
 		}
-               String packed = new JWebWinFactory(null).baseRecToJSON(zObject);
+               String packed = new JWinPackager(null).baseRecToJSON(zObject);
                String payload = "obj_rec_" + packed;
                getRegisteredObjectsNew().put(key, payload);
                return key;
@@ -846,13 +846,13 @@ public class JWebRequest {
                                String payload = obj.substring(6);
                                byte[] raw = inflate(Base64.getDecoder().decode(payload));
                                String json = JTools.byteVectorToString(raw);
-                               return new JWebWinFactory(null).jsonToBaseWin(json);
+                               return new JWinPackager(new JWebWinFactory(null)).jsonToBaseWin(json);
                        }
                        if (obj.startsWith("obj_rec_")) {
                                String payload = obj.substring(8);
                                byte[] raw = inflate(Base64.getDecoder().decode(payload));
                                String json = JTools.byteVectorToString(raw);
-                               return new JWebWinFactory(null).jsonToBaseRec(json);
+                               return new JWinPackager(new JWebWinFactory(null)).jsonToBaseRec(json);
                        }
                        return deserializeObject(obj);
                } catch (Exception e) {
@@ -1113,7 +1113,7 @@ public class JWebRequest {
 //		if (zOwner.isModeWinLov()) return serializeObject(zOwner);
 //		if (!zOwner.isReaded()) return serializeObject(zOwner);
 
-               String packed = new JWebWinFactory(null).baseWinToJSON(zOwner);
+               String packed = new JWinPackager(null).baseWinToJSON(zOwner);
                return "obj_t_" + packed;
         }
 

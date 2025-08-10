@@ -12,6 +12,7 @@ import pss.core.win.actions.BizAction;
 import pss.core.win.submits.JAct;
 import pss.www.platform.actions.JWebActionFactory;
 import pss.www.platform.actions.JWebWinFactory;
+import pss.www.platform.actions.JWinPackager;
 import pss.www.platform.actions.requestBundle.JWebActionData;
 import pss.www.platform.actions.results.JWebActionResult;
 
@@ -52,7 +53,7 @@ public class JDoInternalRequestResolver extends JDoPssActionResolver {
 			}
  			
  			public String serialize() throws Exception {
-       	return JWebActionFactory.ACTION_DATA_PREFIX+"object_owner="+new JWebWinFactory(null).baseWinToJSON(win)+"&"+JWebActionFactory.ACTION_DATA_PREFIX+"act="+action+"&"+JWebActionFactory.ACTION_DATA_PREFIX+"usr="+JTools.encodeURL(usuario);
+        return JWebActionFactory.ACTION_DATA_PREFIX+"object_owner="+new JWinPackager(null).baseWinToJSON(win)+"&"+JWebActionFactory.ACTION_DATA_PREFIX+"act="+action+"&"+JWebActionFactory.ACTION_DATA_PREFIX+"usr="+JTools.encodeURL(usuario);
  			}
  			
 

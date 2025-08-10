@@ -18,6 +18,7 @@ import pss.core.win.submits.JAct;
 import pss.core.win.tools.orders.GuiWinsColumns;
 import pss.www.platform.actions.JWebActionFactory;
 import pss.www.platform.actions.JWebWinFactory;
+import pss.www.platform.actions.JWinPackager;
 import pss.www.platform.actions.requestBundle.JWebActionData;
 
 public class JHistoryProvider implements Serializable {
@@ -41,7 +42,7 @@ public class JHistoryProvider implements Serializable {
 		JWins wins = (JWins) Class.forName(multiSelectName).newInstance();
 		wins.SetEstatico(true);
 		for(String sWin: multipleSelect) {
-			JWin win =(JWin)new JWebWinFactory(null).getRegisterObjectTemp(sWin);
+                               JWin win =(JWin)new JWebWinFactory(null).getRegisterObjectTemp(sWin);
 			wins.addRecord(win);
 		}
 	//	wins.PasarADatos();
@@ -70,7 +71,7 @@ public class JHistoryProvider implements Serializable {
                        JIterator<JWin> it = zMultipleSelect.getStaticIterator();
                        while(it.hasMoreElements()) {
                                JWin win = it.nextElement();
-                               multipleSelect.add(new JWebWinFactory(null).baseWinToJSON(win));
+                               multipleSelect.add(new JWinPackager(null).baseWinToJSON(win));
                        }
                }
        }
