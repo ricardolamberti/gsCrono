@@ -652,35 +652,45 @@ public class JWebWinFactory {
 		}
 	}
 
-	public JBaseWin getRegisterObjectTemp(String zKey) throws Exception {
-		try {
-			return createWinFromPack(zKey, null);
-		} catch (Exception e) {
-			byte[] decoded;
-			try {
-				decoded = java.util.Base64.getUrlDecoder().decode(zKey);
-			} catch (IllegalArgumentException ex) {
-				decoded = java.util.Base64.getDecoder().decode(zKey);
-			}
-			String json = JTools.byteVectorToString(decoded);
-			return createWinFromJson(json, null);
-		}
-	}
+        public JBaseWin getRegisterObjectTemp(String zKey) throws Exception {
+                try {
+                        return createWinFromPack(zKey, null);
+                } catch (Exception e) {
+                       byte[] decoded;
+                       try {
+                               decoded = java.util.Base64.getUrlDecoder().decode(zKey);
+                       } catch (IllegalArgumentException ex) {
+                               decoded = java.util.Base64.getDecoder().decode(zKey);
+                       }
+                       String json;
+                       try {
+                               json = new String(decompress(decoded), StandardCharsets.UTF_8);
+                       } catch (Exception ex2) {
+                               json = JTools.byteVectorToString(decoded);
+                       }
+                       return createWinFromJson(json, null);
+                }
+        }
 
-	public JBaseRecord getRegisterObjectRecTemp(String zKey) throws Exception {
-		try {
-			return createRecFromPack(zKey, null);
-		} catch (Exception e) {
-			byte[] decoded;
-			try {
-				decoded = java.util.Base64.getUrlDecoder().decode(zKey);
-			} catch (IllegalArgumentException ex) {
-				decoded = java.util.Base64.getDecoder().decode(zKey);
-			}
-			String json = JTools.byteVectorToString(decoded);
-			return createRecFromJson(json, null);
-		}
-	}
+        public JBaseRecord getRegisterObjectRecTemp(String zKey) throws Exception {
+                try {
+                        return createRecFromPack(zKey, null);
+                } catch (Exception e) {
+                       byte[] decoded;
+                       try {
+                               decoded = java.util.Base64.getUrlDecoder().decode(zKey);
+                       } catch (IllegalArgumentException ex) {
+                               decoded = java.util.Base64.getDecoder().decode(zKey);
+                       }
+                       String json;
+                       try {
+                               json = new String(decompress(decoded), StandardCharsets.UTF_8);
+                       } catch (Exception ex2) {
+                               json = JTools.byteVectorToString(decoded);
+                       }
+                       return createRecFromJson(json, null);
+                }
+        }
 
 	private boolean isExport() throws Exception {
 		JWebActionData p = JWebActionFactory.getCurrentRequest().getData("export");
