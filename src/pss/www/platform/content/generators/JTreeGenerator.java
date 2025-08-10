@@ -19,7 +19,7 @@ import pss.core.win.submits.JAct;
 import pss.core.winUI.icons.GuiIcon;
 import pss.core.winUI.icons.GuiIconos;
 import pss.www.platform.actions.JWebActionFactory;
-import pss.www.platform.actions.JWebWinFactory;
+import pss.www.platform.actions.JWinPackager;
 import pss.www.ui.controller.JBusinessNodesWebTreeConstants;
 
 public class JTreeGenerator extends JXMLComponentGenerator implements JBusinessNodesWebTreeConstants {
@@ -112,7 +112,7 @@ public class JTreeGenerator extends JXMLComponentGenerator implements JBusinessN
 		this.setAttribute("levelValue", 0);
 		this.setAttribute("expand", false);
 		win.getRecord().keysToFilters();
-		this.setAttribute("act_owner", new JWebWinFactory(null).baseWinToJSON(win));
+                this.setAttribute("act_owner", new JWinPackager(null).baseWinToJSON(win));
 		this.addTextNode("description", win.getDescripFieldValue());
 		this.createIconNode(win.GetIconFile());
 		// this.generateDummy(1);
@@ -127,7 +127,7 @@ public class JTreeGenerator extends JXMLComponentGenerator implements JBusinessN
 		this.setAttribute("applies", true);
 		this.setAttribute("has_children", !action.hasSubActions());
 		this.setAttribute("levelValue", 0);
-		this.setAttribute("act_owner", new JWebWinFactory(null).baseWinToJSON(owner));
+                this.setAttribute("act_owner", new JWinPackager(null).baseWinToJSON(owner));
 		this.setAttribute("expand", !action.hasSubActions());
 //		this.setAttribute("action", JWebActionFactory.idActionToURL(action.getIdAction()));
 		this.setAttribute("action", action.getIdAction());
