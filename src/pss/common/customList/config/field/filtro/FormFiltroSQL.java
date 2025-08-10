@@ -1,13 +1,6 @@
 package  pss.common.customList.config.field.filtro;
 
-import java.awt.Dimension;
-import java.awt.Rectangle;
-
-import javax.swing.JComboBox;
-
 import pss.common.security.BizUsuario;
-import pss.core.ui.components.JPssEdit;
-import pss.core.ui.components.JPssLabel;
 import pss.core.win.JWin;
 import pss.core.win.JWins;
 import pss.core.winUI.controls.JControlCombo;

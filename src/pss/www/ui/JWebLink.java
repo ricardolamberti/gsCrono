@@ -158,7 +158,7 @@ public class JWebLink extends JWebAbstractActionView {
     	zContent.setAttribute("important", this.getImportant());
     zContent.setAttribute("is_cancel", this.isCancel());
     zContent.setAttribute("mode", this.getMode());
-    if ( this.getFunctionKey()!=0) zContent.setAttribute("funtionKey", this.getFunctionKey());
+    if ( this.getFunctionKey()!=0) zContent.setAttribute("functionKey", this.getFunctionKey());
     zContent.setAttribute("key", this.getAccessKey());
 		if (styleImage!=null) 
 			zContent.setAttribute("style_image", styleImage);

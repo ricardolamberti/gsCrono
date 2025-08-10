@@ -1,7 +1,5 @@
 package pss.common.customList.config.field.campo;
 
-import javax.swing.JTree;
-
 import pss.common.customList.config.dynamic.GuiDynamics;
 import pss.common.customList.config.field.BizField;
 import pss.common.customList.config.field.funciones.BizFuncion;
@@ -29,23 +27,14 @@ private static final long serialVersionUID = 1226426905817L;
 
 
 
-	private JTree jTree = null;
-/**
+	/**
    * Constructor de la Clase
    */
   public FormCampoDate() throws Exception {
-    try { jbInit(); }
-    catch (Exception e) { e.printStackTrace(); } 
   }
 
   public GuiCampo getWin() { return (GuiCampo) getBaseWin(); }
 
-  /**
-   * Inicializacion Grafica
-   */
-  protected void jbInit() throws Exception {
-
-  }
   
   @Override
 	public String getTitleRight() {

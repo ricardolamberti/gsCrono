@@ -1,9 +1,5 @@
 package  pss.common.customList.config.customlist;
 
-import java.awt.Rectangle;
-
-import javax.swing.JComboBox;
-
 import pss.common.security.GuiUsuarios;
 import pss.core.win.JWin;
 import pss.core.winUI.forms.JBaseForm;
@@ -14,7 +10,6 @@ public class FormCustomListFav extends JBaseForm {
 private static final long serialVersionUID = 1226426806993L;
 
 
-private JComboBox jModelo = null;
 
 /**
    * Constructor de la Clase
@@ -44,16 +39,5 @@ private JComboBox jModelo = null;
   
 
 
-	/**
-	 * This method initializes jModelo	
-	 * 	
-	 * @return javax.swing.JComboBox	
-	 */
-	private JComboBox getJModelo() {
-		if (jModelo == null) {
-			jModelo = new JComboBox();
-			jModelo.setBounds(new Rectangle(79, 17, 143, 22));
-		}
-		return jModelo;
-	} 
+
 }  //  @jve:decl-index=0:visual-constraint="10,10" 

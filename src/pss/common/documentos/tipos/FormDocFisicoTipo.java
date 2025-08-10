@@ -1,13 +1,5 @@
 package pss.common.documentos.tipos;
 
-import java.awt.Dimension;
-import java.awt.Rectangle;
-
-import javax.swing.JCheckBox;
-import javax.swing.JComboBox;
-
-import pss.core.ui.components.JPssEdit;
-import pss.core.ui.components.JPssLabel;
 import pss.core.win.JWin;
 import pss.core.winUI.forms.JBaseForm;
 

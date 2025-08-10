@@ -1226,9 +1226,10 @@ function goToViaForm(zUrl, zFormToSubmit, zActionOwnerProvider, zObjectOwnerId, 
 		disablear();
 		return;
 	}
-	document.getElementById("navform").dg_dictionary.value=   sessionStorage.getItem('dictionary');
-	document.getElementById("mainform").dg_dictionary.value=  sessionStorage.getItem('dictionary');
-
+	if (zAjaxContainer != '') {
+		document.getElementById("navform").dg_dictionary.value=   sessionStorage.getItem('dictionary');
+		document.getElementById("mainform").dg_dictionary.value=  sessionStorage.getItem('dictionary');
+	}
 	if (runextraaction) runextraaction();
 	// setChangeInputs(false);
 	// alert("url:"+zUrl);
@@ -1246,6 +1247,7 @@ function goToViaForm(zUrl, zFormToSubmit, zActionOwnerProvider, zObjectOwnerId, 
 	zFormToSubmit.method = 'POST';
 	if (zAjaxContainer == '') {
 		zFormToSubmit.action = zUrl;
+
 		if (zUrl == 'closed_subsession') {
 			zFormToSubmit.submit();
 			//setTimeout(function () {

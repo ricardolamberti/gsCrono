@@ -25,12 +25,7 @@ public class FormMailCasilla extends JBaseForm {
     col.AddItemEdit("Nombre", CHAR, REQ, "nombre" );
     col.AddItemEdit("eMail", CHAR, REQ, "mail_From" );
     col.AddItemPassword("Clave", CHAR, REQ, "mail_password" );
-//    AddItem( jUsuarioAut, CHAR, OPT, "internal_user" );
-//    JFormSwingRadio r = this.AddItem( filterEntrante, CHAR, OPT, "filter_entrantes" );
-//    r.AddValor(BizMailCasilla.FILTER_ONLYRESP);
-//    r.AddValor(BizMailCasilla.FILTER_ALL);
-//    r.SetValorDefault(BizMailCasilla.FILTER_ONLYRESP);
-  }
+ }
 
 	/**
 	 * @return

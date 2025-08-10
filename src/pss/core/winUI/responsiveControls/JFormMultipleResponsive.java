@@ -1,7 +1,6 @@
 package pss.core.winUI.responsiveControls;
 
 import java.awt.event.ActionEvent;
-import java.util.Iterator;
 
 import pss.core.tools.JExcepcion;
 import pss.core.tools.collections.JCollectionFactory;

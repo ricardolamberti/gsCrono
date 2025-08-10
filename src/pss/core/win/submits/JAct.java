@@ -286,46 +286,6 @@ public abstract class JAct implements Cloneable, Serializable {
 		 return false;
 	}
 	
-//  public void actionPerformed( ActionEvent zEvt ) {
-//    if (this.shouldPerformInBackground(zEvt)) {
-//      this.performActionInBackground(zEvt);
-//    } else {
-//      try {
-//        this.Do(zEvt);
-//      }
-//      catch (Throwable exc) {
-//        handleException(exc);
-//      }
-//    }
-//  }
-
-
-//  private boolean shouldPerformInBackground(ActionEvent zEvent) {
-//    return this.canPerformInBackground() &&
-//        // the event was generated in the event dispatch thread
-//        SwingUtilities.isEventDispatchThread() &&
-//        // there is a Pss Desktop active
-//        UITools.desktop().isDesktopActive() &&
-//        // the event was generated from a button
-//        zEvent != null && zEvent.getSource() instanceof AbstractButton;
-//  }
-//
-//  private void performActionInBackground(final ActionEvent zActEvent) {
-//    ActionListener oTimerAction = new ActionListener() {
-//      public void actionPerformed(ActionEvent zEvt) {
-//        // ignoro el action event del Timer; me importa el del JAct
-//        try {
-//          Do(zActEvent);
-//        }
-//        catch (Throwable exc) {
-//          handleException(exc);
-//        }
-//      }
-//    };
-//    Timer timer = new Timer(10, oTimerAction);
-//    timer.setRepeats(false);
-//    timer.start();
-//  }
 
   public IControl createControlWin() throws Exception {
     return new JControlWin() { @Override

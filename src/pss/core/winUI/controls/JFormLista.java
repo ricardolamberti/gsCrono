@@ -1,13 +1,5 @@
 package pss.core.winUI.controls;
 
-import java.awt.Component;
-
-import javax.swing.Icon;
-import javax.swing.JPanel;
-import javax.swing.JTabbedPane;
-
-import pss.common.regions.company.JCompanyBusiness;
-import pss.common.regions.multilanguage.JLanguage;
 import pss.common.security.BizUsuario;
 import pss.core.tools.collections.JCollectionFactory;
 import pss.core.tools.collections.JMap;
@@ -15,10 +7,8 @@ import pss.core.win.JBaseWin;
 import pss.core.win.JWin;
 import pss.core.win.JWins;
 import pss.core.win.actions.BizAction;
-import pss.core.winUI.icons.GuiIconos;
 import pss.core.winUI.lists.JWinList;
 import pss.core.winUI.responsiveControls.JFormControlResponsive;
-import pss.core.winUI.responsiveControls.JFormPanelResponsive;
 import pss.core.winUI.responsiveControls.JFormTabPanelResponsive;
 import pss.core.winUI.responsiveControls.JFormTabResponsive;
 import pss.core.winUI.responsiveControls.TableFilterManual;

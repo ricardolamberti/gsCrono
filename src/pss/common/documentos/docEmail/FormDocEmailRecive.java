@@ -1,17 +1,5 @@
 package pss.common.documentos.docEmail;
 
-import java.awt.BorderLayout;
-import java.awt.Dimension;
-import java.awt.Rectangle;
-
-import javax.swing.JTabbedPane;
-
-import pss.core.ui.components.JPssDateTimeEdit;
-import pss.core.ui.components.JPssEdit;
-import pss.core.ui.components.JPssHtmlTextArea;
-import pss.core.ui.components.JPssLabel;
-import pss.core.ui.components.JPssLabelData;
-import pss.core.ui.components.JPssPanel;
 import pss.core.win.JWin;
 import pss.core.winUI.controls.JFormControl;
 import pss.core.winUI.forms.JBaseForm;

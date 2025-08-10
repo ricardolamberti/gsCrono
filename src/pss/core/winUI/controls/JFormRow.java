@@ -1,9 +1,5 @@
 package pss.core.winUI.controls;
 
-import java.awt.Component;
-
-import javax.swing.JPanel;
-
 import pss.core.tools.JTools;
 import pss.core.tools.collections.JIterator;
 import pss.core.win.JWin;

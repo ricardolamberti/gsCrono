@@ -2359,8 +2359,8 @@
 				<xsl:if test="@is_cancel='true'">
 					<script charset="ISO-8859-1">setAnchorCancel('<xsl:value-of select="@name"/>'); adaptChanges( ) ; </script>
 				</xsl:if>
-				<xsl:if test="@funtionKey">
-					<script charset="ISO-8859-1">setAnchorF(<xsl:value-of select="@funtionKey"/>,'<xsl:value-of select="@name"/>'); </script>
+				<xsl:if test="@functionKey">
+					<script charset="ISO-8859-1">setAnchorF(<xsl:value-of select="@functionKey"/>,'<xsl:value-of select="@name"/>'); </script>
 				</xsl:if>
 			</xsl:when>
 			<xsl:otherwise>
@@ -2499,8 +2499,8 @@
 				<xsl:if test="@is_cancel='true'">
 					<script charset="ISO-8859-1">setAnchorCancel('<xsl:value-of select="@name"/>'); adaptChanges( ) ; </script>
 				</xsl:if>
-				<xsl:if test="@funtionKey">
-					<script charset="ISO-8859-1">setAnchorF(<xsl:value-of select="@funtionKey"/>,'<xsl:value-of select="@name"/>'); </script>
+				<xsl:if test="@functionKey">
+					<script charset="ISO-8859-1">setAnchorF(<xsl:value-of select="@functionKey"/>,'<xsl:value-of select="@name"/>'); </script>
 				</xsl:if>
 			</xsl:otherwise>
 		</xsl:choose>
@@ -6188,8 +6188,8 @@
 			<xsl:if test="@is_cancel='true'">
 				<script charset="ISO-8859-1">setAnchorCancel('<xsl:value-of select="@name"/>'); adaptChanges( ) ; </script>
 			</xsl:if>
-			<xsl:if test="@funtionKey">
-				<script charset="ISO-8859-1">setAnchorF(<xsl:value-of select="@funtionKey"/>,'<xsl:value-of select="@name"/>'); </script>
+			<xsl:if test="@functionKey">
+				<script charset="ISO-8859-1">setAnchorF(<xsl:value-of select="@functionKey"/>,'<xsl:value-of select="@name"/>'); </script>
 			</xsl:if>
 		</div>
 	</xsl:template>

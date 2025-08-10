@@ -1,19 +1,7 @@
 package  pss.common.customList.config.field.campo;
 
-import java.awt.Dimension;
-import java.awt.Rectangle;
-
-import javax.swing.JCheckBox;
-import javax.swing.JComboBox;
-import javax.swing.JLabel;
-import javax.swing.JTextField;
-
 import pss.common.customList.config.relation.GuiCamposGallery;
 import pss.common.layout.JFieldSetWins;
-import pss.core.ui.components.JPssColorPicker;
-import pss.core.ui.components.JPssEdit;
-import pss.core.ui.components.JPssHtmlTextArea;
-import pss.core.ui.components.JPssLabel;
 import pss.core.win.JWin;
 import pss.core.win.JWins;
 import pss.core.win.actions.BizAction;

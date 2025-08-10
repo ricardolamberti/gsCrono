@@ -1,22 +1,5 @@
 package pss.core.connectivity.messageManager.common.core;
 
-import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.Rectangle;
-
-import javax.swing.BorderFactory;
-import javax.swing.JTabbedPane;
-import javax.swing.border.TitledBorder;
-
-import pss.core.connectivity.messageManager.server.confMngr.IMMConfigurationSubscriptor;
-import pss.core.tools.collections.JIterator;
-import pss.core.ui.components.JPssPanel;
-import pss.core.win.JWin;
-import pss.core.win.actions.BizAction;
-import pss.core.winUI.controls.JFormControl;
-import pss.core.winUI.controls.JFormControles;
-import pss.core.winUI.controls.JFormForm;
-import pss.core.winUI.controls.JFormLista;
 import pss.core.winUI.forms.JBaseForm;
 
 

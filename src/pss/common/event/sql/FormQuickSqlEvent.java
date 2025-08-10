@@ -27,15 +27,7 @@ public class FormQuickSqlEvent  extends JBaseForm {
 	    AddItemEdit( "consulta", CHAR, OPT, "consulta" );
 	    AddItemEdit( "campo", CHAR, OPT, "campo" );
 	    AddItemEdit( "id", ULONG, OPT, "id" );
-//	    JFormSwingEdit s=AddItem( valor, FLOAT, OPT, "valor" );
-//	    s.setSkinStereotype("big_label");
-//	    s.SetValorDefault(getWin().GetcDato().getValor());
-//	    s.SetReadOnly(true);
-//	    JFormLista l=AddItem( getJTabbedPane(),30 );
-//	    AddItem( getJTabbedPane(),10 );
-//	    AddItem( getJTabbedPane(),40 );
-//	    l.setKeepWidth(false);
-//	    l.setToolBar(false);
+
 	    JFormImageResponsive i=AddItemImage( "Imagen","imagen" );
 	    i.setSource(JPssImage.SOURCE_SCRIPT);
 	    i.setKeepHeight(true);

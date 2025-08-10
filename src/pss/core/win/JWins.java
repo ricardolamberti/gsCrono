@@ -759,15 +759,6 @@ public abstract class JWins<TWin extends JWin> extends JBaseWin {
 			return;
 		}
 
-//		if (control instanceof JFormSwingSearch) {
-//			if (!valorStr.equals("")) {
-//				RFilter filter = this.getRecords().addFilter(this.getRecords().GetTable(), "*", "\"*" + valorStr + "*\"", RFilter.OPERATOR_CONTAINS);
-//				filter.setVirtual(control.getFixedProp().isVirtual());
-//				filter.setDynamic(true);
-//				filter.setUserdefined(!control.isValueDefault());
-//			}
-//			return;
-//		}
 		if (!isObject && valorStr.equals(JFormRadioResponsive.NO_FILTER)) return;
 		
 		String field = control.getFixedProp().GetCampo();

@@ -1,15 +1,9 @@
 package pss.core.winUI.controls;
 
-import java.awt.Component;
-
-import javax.swing.JPanel;
-import javax.swing.JTabbedPane;
-
 import pss.core.win.JWin;
 import pss.core.win.actions.BizAction;
 import pss.core.win.submits.JAct;
 import pss.core.winUI.forms.JBaseForm;
-import pss.core.winUI.responsiveControls.JFormCardResponsive;
 import pss.core.winUI.responsiveControls.JFormTabPanelResponsive;
 import pss.core.winUI.responsiveControls.JFormTabResponsive;
 

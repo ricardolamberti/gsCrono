@@ -1,23 +1,17 @@
 package pss.core.winUI.controls;
 
-import java.awt.Component;
 import java.util.Iterator;
 
 import javax.swing.JLabel;
-import javax.swing.JPanel;
-
-import org.xhtmlrenderer.simple.xhtml.FormControl;
 
 import pss.common.regions.multilanguage.JLanguage;
 import pss.common.security.BizUsuario;
 import pss.core.data.interfaces.structure.RFilter;
 import pss.core.services.records.JRecord;
 import pss.core.tools.JExcepcion;
-import pss.core.tools.PssLogger;
 import pss.core.tools.collections.JCollectionFactory;
 import pss.core.tools.collections.JIterator;
 import pss.core.tools.collections.JList;
-import pss.core.ui.components.JPssLabelFormLov;
 import pss.core.win.JWin;
 import pss.core.winUI.forms.JBaseForm;
 import pss.core.winUI.responsiveControls.IRow;

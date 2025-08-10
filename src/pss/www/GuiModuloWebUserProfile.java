@@ -4,7 +4,6 @@ import pss.common.restJason.apiReqHistory.GuiApiRequestHistorys;
 import pss.common.security.BizUsuario;
 import pss.common.security.GuiWebUserProfile;
 import pss.core.services.records.JRecords;
-import pss.core.tools.collections.JIterator;
 import pss.core.win.JWin;
 import pss.core.win.JWins;
 import pss.core.win.actions.BizAction;
