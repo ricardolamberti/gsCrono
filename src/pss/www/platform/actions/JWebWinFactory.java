@@ -277,97 +277,7 @@ public class JWebWinFactory {
 		return null;
 	}
 
-//	public JBaseWin createWin(JWebActionData zWinBundle,String id) throws Exception {
-//		// instantiate the object
-//		String sUniqueId=id!=null?id:zWinBundle.get("uniqueId");
-//		if (sUniqueId!=null) {
-//			JBaseWin win=getRememberWin(sUniqueId);
-//			if (win!=null)
-//				return win;
-//		}
-//		JBaseWin actionOwner=null;
-//		String sClass=null;
-//		Class<?> oClass=null;
-//		try {
-//			sClass=zWinBundle.get("cls");
-//			oClass=Class.forName(sClass);
-//			actionOwner=(JBaseWin) oClass.newInstance();
-//			actionOwner.setUniqueID(sUniqueId);
-//			actionOwner.SetVision(zWinBundle.get("vision"));
-//			if (actionOwner.isWin())
-//				 ((JWin) actionOwner).getRecord().setDatosLeidos(zWinBundle.get("readed").equals("S"));
-//
-//			if (sUniqueId!=null) {
-//				rememberWin(sUniqueId,actionOwner);
-//			}
-//			if (zWinBundle.get("drop")!=null) {
-//				JWebActionFactory.getCurrentRequest().addDataBundle("act_drop", (String) JTools.byteVectorToString(Base64.getDecoder().decode(zWinBundle.get("drop"))));
-//				JWebActionData bundle=loadWinBundle("act_drop");
-//				if (bundle==null) return null;
-//				actionOwner.setDropListener( this.getBaseWinFromBundle(bundle,true,id));
-//
-//			}
-//			if (zWinBundle.get("dropControl")!=null) {
-//				actionOwner.setDropControlIdListener((JAct)JWebActionFactory.getCurrentRequest().deserializeObject( JTools.byteVectorToString(Base64.getDecoder().decode(zWinBundle.get("dropControl")))));
-//			}
-//		} catch (Exception e) {
-//			PssLogger.logError(e);
-//		}
-//		if (sClass==null) {
-//			throw new RuntimeException("Pss action request owner data has no class name parameter");
-//		}
-//		if (oClass==null) {
-//			throw new RuntimeException("Pss action class not found: "+sClass);
-//		}
-//		if (actionOwner==null) {
-//			throw new RuntimeException("Not a JBaseWin class: "+sClass);
-//		}
-//		return actionOwner;
-//	}
 
-//	private void asignFilters(JWebActionData zWinBundle, JBaseWin zActionOwner) throws Exception {
-//		JIterator<JWebActionDataField> oFieldIt=zWinBundle.getFieldIterator();
-//		String sFilterPrefix="fltr_";
-//		while (oFieldIt.hasMoreElements()) {
-//			JWebActionDataField oField=oFieldIt.nextElement();
-//			if (!oField.getName().startsWith(sFilterPrefix)) continue;
-//			String field=oField.getName().substring(sFilterPrefix.length());
-//			// int idx = fullField.indexOf(".");
-//			// String field = (idx<0)? fullField : fullField.substring(idx+1);
-//			if (!this.okFilter(zActionOwner, field)) continue;
-//			zActionOwner.GetBaseDato().addFilter(field, oField.getValue(), oField.getOperator());
-//			zActionOwner.GetBaseDato().forceFilterToData();
-//			// RFilter filtro=zActionOwner.GetBaseDato().addFilter(field,
-//			// oField.getValue(), oField.getOperator());
-//			// if (idx>=0) filtro.setTable(fullField.substring(0, idx));
-//		}
-//	}
-//
-//	private void asignProps(JWebActionData zWinBundle, JBaseWin zActionOwner) throws Exception {
-//		if (!zActionOwner.isWin()) return;
-//		JIterator<JWebActionDataField> oFieldIt=zWinBundle.getFieldIterator();
-//		String sFilterPrefix="rec_";
-//		String sRecFilterPrefix="onerec_";
-//		String sRecsFilterPrefix="recs_";
-//		while (oFieldIt.hasMoreElements()) {
-//			JWebActionDataField oField=oFieldIt.nextElement();
-//			if (oField.getName().startsWith(sFilterPrefix)) {
-//				String field=oField.getName().substring(sFilterPrefix.length());
-//				JObject obj = ((JWin)zActionOwner).getRecord().getProp(field);
-//				obj.setValue(((JWin)processObjectRegisteredByIdForCard(oField.getValue())).getRecord());
-//			}
-//			if (oField.getName().startsWith(sRecFilterPrefix)) {
-//				String field=oField.getName().substring(sFilterPrefix.length());
-//				JObject obj = ((JWin)zActionOwner).getRecord().getProp(field);
-//				obj.setValue(getRegisterObjectTemp(oField.getValue().substring(7)));
-//			}
-//			if (oField.getName().startsWith(sRecsFilterPrefix)) {
-//				String field=oField.getName().substring(sFilterPrefix.length());
-//				JObject obj = ((JWin)zActionOwner).getRecord().getProp(field);
-//				obj.setValue(getRegisterObjectTemp(oField.getValue().substring(5)));
-//			}
-//		}
-//	}
 	private boolean okFilter(JBaseRecord baseRec, String filter) throws Exception {
 		if (!(baseRec instanceof JRecord))
 			return true;
@@ -892,55 +802,7 @@ public class JWebWinFactory {
                 PackCaches.invalidateRecKey("rec:" + recStamp(rec));
         }
 
-//
-//		JWebActionData oData = new JWebActionData("");
-//		oData.add("cls", zOwner.getClass().getName());
-//		oData.add("uniqueId", zOwner.getUniqueId());
-//		oData.add("vision", zOwner.GetVision());
-//		if (zOwner.isWin())
-//			oData.add("readed", ((JWin) zOwner).getRecord().wasDbRead() ? "S" : "N");
-//		if (zOwner.hasDropListener()) {
-//			oData.add("drop", Base64.getEncoder().encodeToString(JTools.stringToByteArray(baseWinToJSON(zOwner.getDropListener()))));
-//		}
-//		if (zOwner.hasDropControlIdListener()) {
-//			oData.add("dropControl", Base64.getEncoder().encodeToString(JTools.stringToByteArray(JWebActionFactory.getCurrentRequest().serializeObject(zOwner.getDropControlIdListener()))));
-//
-//		}
-//		if (zOwner.isWin() && zOwner.GetBaseDato().getFilters().isEmpty())
-//			((JWin) zOwner).getRecord().keysToFilters();
-//		JList<RFilter> filters = zOwner.GetBaseDato().getFilters();
-//		if (filters != null && !filters.isEmpty()) {
-//			JIterator<RFilter> iter = filters.getIterator();
-//			RFilter filter;
-//			while (iter.hasMoreElements()) {
-//				filter = iter.nextElement();
-//				if (filter.isDynamic())
-//					continue;
-//				oData.add("fltr_" + filter.getField(), filter.getOperator(), filter.getValue());
-//			}
-//		}
-//		if (zOwner.isWin()) {
-//			JMap<String, JObject<?>> props = ((JWin) zOwner).getRecord().getProperties();
-//			JIterator<String> it = props.getKeyIterator();
-//			while (it.hasMoreElements()) {
-//				String key = it.nextElement();
-//				JObject prop = props.getElement(key);
-////					if (!(prop.isRecord()||prop.isRecords())) continue;
-//				if (prop.isRecord()) {
-//					oData.add("onerec_" + key, JWebActionFactory.getCurrentRequest().registerWinObjectObj((JWin) prop.getObjectValue()));
-//				}
-//				if (prop.isRecords()) {
-//					oData.add("recs_" + key, JWebActionFactory.getCurrentRequest().registerWinObjectObj((JWins) prop.getObjectValue()));
-//				}
-//				if (!prop.hasValue())
-//					continue;
-//				if (prop.getUniqueId() == null)
-//					continue;
-//				oData.add("rec_" + key, prop.getUniqueId());
-//			}
-//		}
-//		return JWebActionFactory.fieldsAsURLString(oData, false);
-//	}
+
 	private final ObjectMapper objectMapper = new ObjectMapper();
 
 	// Serializar JBaseWin y JBaseRecord a JSON plano
