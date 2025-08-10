@@ -61,7 +61,7 @@ public class BizAction extends JRecord {
 	private boolean bDinamic = false;
 	private boolean bMulti = false;
 	private boolean bGroup = false;
-	private boolean bSwap= false;
+	private boolean bSwap = false;
 	private boolean bReportDetail = false;
 	private boolean bConfirmMessage = false;
 	private String sConfirmMessageDescription = null;
@@ -74,8 +74,8 @@ public class BizAction extends JRecord {
 	private boolean bOnlyInMobile = false;
 	private boolean bImprimir = false;
 	private boolean bNuevaSession = false;
-	private boolean bRefreshFatherWindow = false; //refresca la ventana padre, en caso de nueva ventana
-	private boolean bCloseFatherWindow = false; //refresca la ventana padre, en caso de nueva ventana
+	private boolean bRefreshFatherWindow = false; // refresca la ventana padre, en caso de nueva ventana
+	private boolean bCloseFatherWindow = false; // refresca la ventana padre, en caso de nueva ventana
 
 	private boolean bAccessToDetail = false;
 	private boolean bBackAction = true;
@@ -86,8 +86,7 @@ public class BizAction extends JRecord {
 	private boolean bBreak = false;
 	private boolean bInAlta = false;
 	private String specialSelector = null;
-  private Serializable data; //datos libre para enviar dentro de un submit
- 
+	private Serializable data; // datos libre para enviar dentro de un submit
 
 	public long lImportance = 0;
 	private boolean bOkAction = true;
@@ -98,15 +97,15 @@ public class BizAction extends JRecord {
 	}
 
 	public void setOkAction(boolean v) {
-		this.bOkAction=v;
+		this.bOkAction = v;
 	}
-	
+
 	public boolean isOkAction() {
 		return this.bOkAction;
 	}
-	
+
 	public void setOkSecurity(boolean v) {
-		this.bOkSecurity=v;
+		this.bOkSecurity = v;
 	}
 
 	public boolean isOkSecurity() {
@@ -148,6 +147,7 @@ public class BizAction extends JRecord {
 		this.lImportance = lImportance;
 		return this;
 	}
+
 	public Serializable getData() {
 		return data;
 	}
@@ -155,6 +155,7 @@ public class BizAction extends JRecord {
 	public void setData(Serializable data) {
 		this.data = data;
 	}
+
 	public boolean isBackOnPrint() {
 		return bBackOnPrint;
 	}
@@ -163,6 +164,7 @@ public class BizAction extends JRecord {
 		this.bBackOnPrint = bBackInPrint;
 		return this;
 	}
+
 	public boolean isRefreshOnPrint() {
 		return bRefreshOnPrint;
 	}
@@ -172,7 +174,6 @@ public class BizAction extends JRecord {
 		return this;
 	}
 
-	
 	private transient JFilterMap filterMap = null; // filtros dinamicos que vienen en el request
 
 	private transient BizAction ownerFilterMap = null;
@@ -185,9 +186,9 @@ public class BizAction extends JRecord {
 	public byte kMenu = 0;
 	public byte kPanel = 0;
 	public byte kWeb = 0;
-	protected boolean bCancelable=false;
-	protected boolean uploaddata=false;
-	protected boolean isSubmitedByUser=false;
+	protected boolean bCancelable = false;
+	protected boolean uploaddata = false;
+	protected boolean isSubmitedByUser = false;
 
 	// Esto sólo se utiliza en casos muy puntuales y se inicializa on demand
 	// private JList oFiltros = null;
@@ -204,7 +205,6 @@ public class BizAction extends JRecord {
 		this.isSubmitedByUser = isSubmitedByUser;
 	}
 
-	
 	public boolean isUploadData() {
 		return uploaddata;
 	}
@@ -216,8 +216,8 @@ public class BizAction extends JRecord {
 
 	public void setObjFilterMap(BizAction f) {
 		filterMap = f.getFilterMap();
-		ownerFilterMap=f;
-		bFirstAccess=f.isFirstAccess();
+		ownerFilterMap = f;
+		bFirstAccess = f.isFirstAccess();
 	}
 
 	public BizAction getOwnerFilterMap() {
@@ -232,6 +232,7 @@ public class BizAction extends JRecord {
 	public boolean isNuevaVentana() {
 		return bNuevaVentana;
 	}
+
 	public BizAction setNuevaSession(boolean b) {
 		bNuevaSession = b;
 		return this;
@@ -240,6 +241,7 @@ public class BizAction extends JRecord {
 	public boolean isNuevaSession() {
 		return bNuevaSession;
 	}
+
 	public BizAction setModal(boolean b) {
 		bModal = b;
 		return this;
@@ -248,12 +250,15 @@ public class BizAction extends JRecord {
 	public boolean isModal() {
 		return bModal;
 	}
+
 	public boolean isRefreshFatherWindow() {
 		return bRefreshFatherWindow;
 	}
+
 	public boolean isCloseFatherWindow() {
 		return bCloseFatherWindow;
 	}
+
 	public BizAction setImprimir(boolean b) {
 		bImprimir = b;
 		return this;
@@ -262,7 +267,8 @@ public class BizAction extends JRecord {
 	public boolean isImprimir() {
 		return bImprimir;
 	}
-  public boolean isCancelable() {
+
+	public boolean isCancelable() {
 		return bCancelable;
 	}
 
@@ -270,7 +276,7 @@ public class BizAction extends JRecord {
 		this.bCancelable = bCancelable;
 		return this;
 	}
-	
+
 	public String getSpecialSelector() {
 		return specialSelector;
 	}
@@ -279,12 +285,13 @@ public class BizAction extends JRecord {
 		this.specialSelector = specialSelector;
 		return this;
 	}
+
 	public String getHelp() throws Exception {
 		return sHelp;
 	}
 
 	public BizAction setHelp(String zHelp) {
-		this.sHelp=zHelp;
+		this.sHelp = zHelp;
 		return this;
 	}
 
@@ -303,18 +310,20 @@ public class BizAction extends JRecord {
 		return this;
 	}
 
-	String postFunction=null;
+	String postFunction = null;
+
 	public String getPostFunction() {
 		return postFunction;
 	}
+
 	public BizAction setPostFunction(String s) {
-		this.postFunction=s;
+		this.postFunction = s;
 		return this;
 	}
-	public boolean hasPostFunction() {
-		return this.postFunction!=null;
-	}
 
+	public boolean hasPostFunction() {
+		return this.postFunction != null;
+	}
 
 	public void setCompany(String value) {
 		pCompany.setValue(value);
@@ -366,8 +375,9 @@ public class BizAction extends JRecord {
 
 	public JBaseWin getResult() throws Exception {
 		JAct submit = this.getObjSubmit();
-		
-		if (submit == null) return null;
+
+		if (submit == null)
+			return null;
 		return submit.getResult();
 	}
 
@@ -375,27 +385,28 @@ public class BizAction extends JRecord {
 		this.submit = value;
 		this.submit.setActionSource(this);
 	}
-	
+
 	public JAct refreshSubmit() throws Exception {
 		this.clearSubmit();
 		return this.getObjSubmit();
 	}
 
 	public JAct getObjSubmit() throws Exception {
-		if (submit != null) return submit;
+		if (submit != null)
+			return submit;
 		submit = this.getSubmit();
 		return submit;
 	}
 
 	public JAct getSubmit() throws Exception {
-		JAct submit=null;
+		JAct submit = null;
 		if (this.hasToCreateMultiAction())
 			submit = this.createMultiAction(this);
 		else if (this.hasToCreateGroupAction())
 			submit = this.createGroupAction(this);
-		else	
+		else
 			submit = owner.getSubmit(this);
-		
+
 		if (submit != null) {
 			submit.setActionSource(this);
 			submit.setData(getData());
@@ -404,12 +415,13 @@ public class BizAction extends JRecord {
 	};
 
 	public void clearSubmit() throws Exception {
-		if (sOwner==null) return;
+		if (sOwner == null)
+			return;
 		submit = null;
 	}
-	
+
 	public boolean hasSubmit() throws Exception {
-		return this.submit!=null;
+		return this.submit != null;
 	}
 
 	public void SetAction(JAct zAct) throws Exception {
@@ -451,10 +463,12 @@ public class BizAction extends JRecord {
 		kOnlyForm = (byte) (zValue ? 1 : 0);
 		return this;
 	}
+
 	public BizAction setNotInForm(boolean zValue) {
 		kNotInForm = (byte) (zValue ? 1 : 0);
 		return this;
 	}
+
 	public BizAction setPanel(boolean zValue) {
 		kPanel = (byte) (zValue ? 1 : 0);
 		return this;
@@ -474,12 +488,14 @@ public class BizAction extends JRecord {
 		bMulti = zValue;
 		return this;
 	}
+
 	public BizAction setSwap(boolean zValue) {
 		bGroup = zValue;
 		bMulti = zValue;
 		bSwap = zValue;
 		return this;
 	}
+
 	public void changeOwner(String zValue) {
 		sOwner = zValue;
 		bDinamic = true;
@@ -523,9 +539,11 @@ public class BizAction extends JRecord {
 	public boolean isBreak() {
 		return this.bBreak;
 	}
+
 	public boolean isInAlta() {
 		return this.bInAlta;
 	}
+
 	public boolean isAccessToDetail() {
 		return bAccessToDetail;
 	}
@@ -538,35 +556,35 @@ public class BizAction extends JRecord {
 		sOwner = zValue;
 	}
 
-        public BizAction() throws Exception {
-        }
+	public BizAction() throws Exception {
+	}
 
-        public void setObjOwner(JBaseWin zValue) {
-                owner = zValue;
-        }
+	public void setObjOwner(JBaseWin zValue) {
+		owner = zValue;
+	}
 
-        public JBaseWin getObjOwner() {
-                return owner;
-        }
+	public JBaseWin getObjOwner() {
+		return owner;
+	}
 
-        /**
-         * Indicates whether this action requires full object serialization when
-         * being transferred between client and server. Subclasses may override
-         * this method to opt-out of the compact transfer path.
-         *
-         * @return {@code true} if the full action must be serialized, {@code false}
-         *         otherwise.
-         */
-        public boolean needsFullSerialization() throws Exception {
-                return  getIdAction().startsWith("anonimus_");
-        }
+	/**
+	 * Indicates whether this action requires full object serialization when being
+	 * transferred between client and server. Subclasses may override this method to
+	 * opt-out of the compact transfer path.
+	 *
+	 * @return {@code true} if the full action must be serialized, {@code false}
+	 *         otherwise.
+	 */
+	public boolean needsFullSerialization() throws Exception {
+		return getIdAction().startsWith("anonimus_");
+	}
 
 	public JWin getObjWinOwner() {
-		return (JWin)owner;
+		return (JWin) owner;
 	}
 
 	public JWins getObjWinsOwner() {
-		return (JWins)owner;
+		return (JWins) owner;
 	}
 
 	public boolean isWins() {
@@ -613,6 +631,7 @@ public class BizAction extends JRecord {
 	public boolean isSwap() throws Exception {
 		return bSwap;
 	}
+
 	public void execDeshabilitarPermisos() throws Exception {
 		JExec oExec = new JExec(this, "DeshabilitarPermisos") {
 			@Override
@@ -639,12 +658,13 @@ public class BizAction extends JRecord {
 		};
 		oExec.execute();
 	}
-	
+
 	public String getCompany() throws Exception {
-		if (pCompany.isNotNull()) return this.pCompany.getValue();
+		if (pCompany.isNotNull())
+			return this.pCompany.getValue();
 		return BizUsuario.getUsr().getCompany();
 	}
-	
+
 	public String getOperDescrip() throws Exception {
 		String d = sTitle + " - " + pDescr.getValue();
 		if (this.isPanel())
@@ -672,8 +692,10 @@ public class BizAction extends JRecord {
 
 	public boolean VerificarHabilitacion() throws Exception {
 		BizOperacionRol oOper = BizUsuario.OperacionHabilitada(pAccion.getValue());
-		if (oOper == null) return false;
-		if (!oOper.ifClaveSupervisor()) return true;
+		if (oOper == null)
+			return false;
+		if (!oOper.ifClaveSupervisor())
+			return true;
 //		oActionAutorizada = submit;
 //
 //		submit = new JAct() {
@@ -684,13 +706,13 @@ public class BizAction extends JRecord {
 		return true;
 	}
 
-
 	public boolean isPermisosHabilitados() throws Exception {
 		return BizOperacion.getHash(BizUsuario.getUsr().getCompany()).getElement(pAccion.getValue()) == null;
 	}
 
 	public boolean hasSubActions() throws Exception {
-		if (this.subActions == null) return false;
+		if (this.subActions == null)
+			return false;
 		return (this.subActions.ifRecordFound());
 	}
 
@@ -713,23 +735,28 @@ public class BizAction extends JRecord {
 	public boolean useDefaultToolBarMore() throws Exception {
 		return kToolBarMore == -1;
 	}
+
 	public boolean ifToolBarMore() throws Exception {
-		return kToolBarMore == 1 || kToolBarMore == -1  ;
+		return kToolBarMore == 1 || kToolBarMore == -1;
 	}
 
 	public boolean isOnlyInForm() throws Exception {
 		return kOnlyForm == 1;
 	}
+
 	public boolean isNotInForm() throws Exception {
 		return kNotInForm == 1;
 	}
+
 	public boolean isListType() throws Exception {
-		if (sTipoArbol == null) return false;
+		if (sTipoArbol == null)
+			return false;
 		return sTipoArbol.equalsIgnoreCase("Group");
 	}
 
 	public boolean isListTypeUnique() throws Exception {
-		if (sTipoArbol == null) return false;
+		if (sTipoArbol == null)
+			return false;
 		return sTipoArbol.equalsIgnoreCase("Detail");
 	}
 
@@ -747,7 +774,8 @@ public class BizAction extends JRecord {
 	 * return icon; }
 	 */
 	public BizAction addSubAction(BizAction subAction) throws Exception {
-		if (this.subActions == null) this.subActions = new BizActions();
+		if (this.subActions == null)
+			this.subActions = new BizActions();
 		this.subActions.addItem(subAction);
 		return subAction;
 	}
@@ -781,6 +809,7 @@ public class BizAction extends JRecord {
 	public void setIconFile(String zValue) {
 		this.setIconFile(0, zValue);
 	}
+
 	public void setIconFile(int size, String zValue) {
 		sIconFileSize[size] = zValue;
 	}
@@ -796,9 +825,10 @@ public class BizAction extends JRecord {
 	public String getIconFile(int size) throws Exception {
 		if (this.sIconFileSize[size] != null)
 			return this.sIconFileSize[size];
-		else return GuiIconos.GetGlobal().buscarIcono(size,this.GetNroIcono()).GetFile();
+		else
+			return GuiIconos.GetGlobal().buscarIcono(size, this.GetNroIcono()).GetFile();
 	}
-	
+
 	public String getIconFile() throws Exception {
 		return getIconFile(0);
 //		if (this.sIconFile != null)
@@ -833,15 +863,16 @@ public class BizAction extends JRecord {
 		if (!wins.getRecords().ifRecordFound()) {
 			JWin win = wins.getWinRefWithActions();
 			win.setDropListener(wins.getDropListener());
-			JAct submit =win.getSubmit(a);
-			
+			JAct submit = win.getSubmit(a);
+
 			groupAct.setAct(submit);
 			groupAct.setExitOnOk(submit.isExitOnOk());
 			return groupAct;
 		}
 		JWin win = wins.getFirstRecord();
 		JAct act = win.getSubmit(a);
-		if (!act.isOnlySubmit()) return act; 
+		if (!act.isOnlySubmit())
+			return act;
 		JAct submit = win.getSubmit(a);
 		groupAct.setAct(submit);
 		groupAct.setExitOnOk(submit.isExitOnOk());
@@ -903,7 +934,8 @@ public class BizAction extends JRecord {
 		clone.kMenu = kMenu;
 		clone.kPanel = kPanel;
 		clone.kWeb = kWeb;
-		if (!this.hasSubActions()) return clone;
+		if (!this.hasSubActions())
+			return clone;
 		JIterator iter = this.GetSubAcciones().getStaticIterator();
 		while (iter.hasMoreElements()) {
 			BizAction subAction = (BizAction) iter.nextElement();
@@ -920,7 +952,6 @@ public class BizAction extends JRecord {
 		return this.pId == UPDATE;
 	}
 
-	
 	public boolean isRemoveAction() {
 		return this.pId == REMOVE;
 	}
@@ -932,7 +963,7 @@ public class BizAction extends JRecord {
 	public boolean isReportAction() {
 		return this.pId == REPORT;
 	}
-	
+
 	public void addFilterMap(RFilter f) throws Exception {
 		this.addFilterMap(f.getField(), f.getValue());
 	}
@@ -940,28 +971,37 @@ public class BizAction extends JRecord {
 	public void addFilterMap(String filter, Date value) throws Exception {
 		this.addFilterMap(filter, JDateTools.DateToString(value));
 	}
+
 	public void addFilterMap(String filter, Serializable value) throws Exception {
-		if (filter==null) return;
-		if (this.filterMap == null) this.filterMap = new JFilterMap();
+		if (filter == null)
+			return;
+		if (this.filterMap == null)
+			this.filterMap = new JFilterMap();
 		this.filterMap.setFieldChange(filter);
 		this.filterMap.addFilterMap(filter, value);
 	}
 
 	public void addFilterMap(String filter, String value) throws Exception {
-		if (this.filterMap == null) this.filterMap = new JFilterMap();
+		if (this.filterMap == null)
+			this.filterMap = new JFilterMap();
 		this.filterMap.addFilterMap(filter, value);
 	}
 
 	public String getFilterMapValue(String f, String def) throws Exception {
-		if (!this.hasFilterMap()) return def;
-		return (String)this.filterMap.getFilterValue(f, def);
+		if (!this.hasFilterMap())
+			return def;
+		return (String) this.filterMap.getFilterValue(f, def);
 	}
+
 	public Object getFilterMapObjValue(String f, String def) throws Exception {
-		if (!this.hasFilterMap()) return def;
+		if (!this.hasFilterMap())
+			return def;
 		return this.filterMap.getFilterValue(f, def);
 	}
+
 	public boolean hasFilterMapValue(String f) throws Exception {
-		if (!this.hasFilterMap()) return false;
+		if (!this.hasFilterMap())
+			return false;
 		return !this.getFilterMapValue(f, "").isEmpty();
 	}
 
@@ -989,7 +1029,7 @@ public class BizAction extends JRecord {
 		return bFilterAction;
 	}
 
-	public boolean isFirstAccess()  {
+	public boolean isFirstAccess() {
 		return bFirstAccess;
 	}
 
@@ -1004,10 +1044,11 @@ public class BizAction extends JRecord {
 	public void setExport(boolean value) throws Exception {
 		bExport = value;
 	}
-	
+
 	public void setBreak(boolean value) throws Exception {
 		bBreak = value;
 	}
+
 	public void setInAlta(boolean value) throws Exception {
 		bInAlta = value;
 	}
@@ -1026,8 +1067,10 @@ public class BizAction extends JRecord {
 	}
 
 	public boolean waitMoreFilters() throws Exception {
-		if (this.isExport()) return false;
-		if (this.isFirstAccess()) return true;
+		if (this.isExport())
+			return false;
+		if (this.isFirstAccess())
+			return true;
 		return false;
 	}
 
@@ -1037,29 +1080,32 @@ public class BizAction extends JRecord {
 	}
 
 	String row;
+
 	public String getRow() {
 		return row;
 	}
-	
+
 	public int getRowAsInt() {
 		return Integer.parseInt(row);
 	}
 
 	public long getRowAsLong() {
-		return Long.parseLong	(row);
+		return Long.parseLong(row);
 	}
 
 	public void setRow(String row) {
 		this.row = row;
 	}
+
 	public boolean hasRow() {
-		if (row==null) return false;
-		if (row.isEmpty()) return false;
+		if (row == null)
+			return false;
+		if (row.isEmpty())
+			return false;
 		return true;
 	}
-	
+
 	public String forceProviderName;
-	
 
 	public String getForceProviderName() {
 		return forceProviderName;
@@ -1070,12 +1116,14 @@ public class BizAction extends JRecord {
 	}
 
 	public String getProviderName() throws Exception {
-		if (forceProviderName!=null) return forceProviderName;
+		if (forceProviderName != null)
+			return forceProviderName;
 //		return "prov_"+this.getObjSubmit().getResult().hashCode();
-		String action = JWebActionFactory.getCurrentRequest().getNameDictionary(this.getIdAction().replace(".", "_")+((getData()!=null)?getData().toString():""));
-		if (JWebActionFactory.getCurrentRequest().getLevel()>1) action+="__l"+JWebActionFactory.getCurrentRequest().getLevel();
-		 
-		return "p_"+action+(row!=null?"_"+row:"");
+		String action = JWebActionFactory.getCurrentRequest().getNameDictionary(this.getIdAction().replace(".", "_") + ((getData() != null) ? getData().toString() : ""));
+		if (JWebActionFactory.getCurrentRequest().getLevel() > 1)
+			action += "__l" + JWebActionFactory.getCurrentRequest().getLevel();
+
+		return "p_" + action + (row != null ? "_" + row : "");
 	}
 
 	public void setObjFilterMap(JFilterMap f) {
@@ -1095,19 +1143,20 @@ public class BizAction extends JRecord {
 //	}
 
 	public boolean isSameAction(BizAction other) throws Exception {
-		if (this.getIdAction().isEmpty()) return false;
+		if (this.getIdAction().isEmpty())
+			return false;
 		return other.getIdAction().equals(this.getIdAction());
 	}
 
 	public JBaseForm findFormFlat(int sector) throws Exception {
 		JAct submit = this.getObjSubmit();
-		JBaseForm formFlat=submit.getFormFlat();
+		JBaseForm formFlat = submit.getFormFlat();
 		formFlat.setMake(sector);
 		return formFlat;
 	}
-	
+
 	public void setBackground(String v) {
-		this.background=v;
+		this.background = v;
 	}
 
 	public String getBackground() {
@@ -1115,7 +1164,7 @@ public class BizAction extends JRecord {
 	}
 
 	public void setForeground(String v) {
-		this.foreground=v;
+		this.foreground = v;
 	}
 
 	public String getForeground() {

@@ -797,6 +797,7 @@ public class JWebWinFactory {
 		return JWebActionFactory.getCurrentRequest().serializeRegisterMapJSON(dict);
 
 	}
+	
 
 	public BizAction convertURLToAction(String sAction) throws Exception {
 		Map<String, String> dict = JWebActionFactory.getCurrentRequest().deserializeRegisterMapJSON(sAction);

@@ -741,19 +741,12 @@ public class JWebRequest {
 
 	}
 
-	public synchronized String registerObject(String pos, JBaseWin zBaseWin) throws Exception {
-		if (zBaseWin == null)
-			return null;
-		if (reuseIfPresent(pos) != null)
-			return pos;
-		this.getRegisteredObjectsNew().put(pos, baseWinToSession(zBaseWin));
-		return pos;
-	}
+
 
 	private boolean isLargeObject(Object obj) throws Exception {
-		if (obj instanceof JBaseWin) {
-			return ((JBaseWin) obj).canConvertToURL();
-		}
+//		if (obj instanceof JBaseWin) {
+//			return ((JBaseWin) obj).canConvertToURL();
+//		}
 		// Placeholder for real implementation or marker interface check
 		return true;
 	}
@@ -790,19 +783,21 @@ public class JWebRequest {
 	Map<String, String> objectsCreated = new HashMap<String, String>();
 
 	public synchronized String registerWinObjectObj(JBaseWin zObject) throws Exception {
+		if (objectsCreated.containsKey(zObject.getUniqueId()))
+			return objectsCreated.get(zObject.getUniqueId());
 		if (isLargeObject(zObject)) {
 			String id = zObject.getUniqueId() != null ? zObject.getUniqueId() : UUID.randomUUID().toString();
 			LARGE_OBJECT_CACHE.put(id, zObject);
-			getRegisteredObjectsNew().put(id, CACHE_PREFIX + id);
-			return CACHE_PREFIX + id;
+			String out = CACHE_PREFIX + id;
+			getRegisteredObjectsNew().put(id, out);
+			objectsCreated.put(zObject.getUniqueId(), out);
+			return out;
 		}
-               if (objectsCreated.containsKey(zObject.getUniqueId()))
-                       return objectsCreated.get(zObject.getUniqueId());
-               String packed = new JWinPackager(null).baseWinToJSON(zObject);
-               String out = "obj_t_" + packed;
-               objectsCreated.put(zObject.getUniqueId(), out);
-               return out;
-        }
+		String packed = new JWinPackager(null).baseWinToJSON(zObject);
+		String out = "obj_t_" + packed;
+		objectsCreated.put(zObject.getUniqueId(), out);
+		return out;
+	}
 
 	public synchronized String registerRecObjectObj(JBaseRecord zObject) throws Exception {
 		if (zObject == null)
@@ -815,11 +810,11 @@ public class JWebRequest {
 			getRegisteredObjectsNew().put(key, CACHE_PREFIX + key);
 			return key;
 		}
-               String packed = new JWinPackager(null).baseRecToJSON(zObject);
-               String payload = "obj_rec_" + packed;
-               getRegisteredObjectsNew().put(key, payload);
-               return key;
-        }
+		String packed = new JWinPackager(null).baseRecToJSON(zObject);
+		String payload = "obj_rec_" + packed;
+		getRegisteredObjectsNew().put(key, payload);
+		return key;
+	}
 
 	public Serializable getRegisterObject(String key) {
 		String obj = getRegisteredObjectsOld().get(key);
@@ -837,34 +832,54 @@ public class JWebRequest {
 			if (obj.startsWith("obj_rec:")) {
 				return (Serializable) fetchFromCache(obj.substring(8));
 			}
-                       if (obj.startsWith("obj_t_")) {
-                               String payload = obj.substring(6);
-                               byte[] raw = JWinPackager.inflate(Base64.getDecoder().decode(payload));
-                               String json = JTools.byteVectorToString(raw);
-                               return new JWinPackager(new JWebWinFactory(null)).jsonToBaseWin(json);
-                       }
-                       if (obj.startsWith("obj_rec_")) {
-                               String payload = obj.substring(8);
-                               byte[] raw = JWinPackager.inflate(Base64.getDecoder().decode(payload));
-                               String json = JTools.byteVectorToString(raw);
-                               return new JWinPackager(new JWebWinFactory(null)).jsonToBaseRec(json);
-                       }
-                       return deserializeObject(obj);
-               } catch (Exception e) {
-                       PssLogger.logError(e);
-                       return null;
+			if (obj.startsWith("obj_t_")) {
+				String payload = obj.substring(6);
+				byte[] raw = JWinPackager.inflate(Base64.getDecoder().decode(payload));
+				String json = JTools.byteVectorToString(raw);
+				return new JWinPackager(new JWebWinFactory(null)).jsonToBaseWin(json);
+			}
+			if (obj.startsWith("obj_rec_")) {
+				String payload = obj.substring(8);
+				byte[] raw = JWinPackager.inflate(Base64.getDecoder().decode(payload));
+				String json = JTools.byteVectorToString(raw);
+				return new JWinPackager(new JWebWinFactory(null)).jsonToBaseRec(json);
+			}
+			return deserializeObject(obj);
+		} catch (Exception e) {
+			PssLogger.logError(e);
+			return null;
 		}
 	}
 
+//	public synchronized String registerObject(JBaseWin zBaseWin) throws Exception {
+//		if (zBaseWin == null)
+//			return null;
+//		String key = zBaseWin.getUniqueId();
+//		if (reuseIfPresent(key) != null)
+//			return key;
+//		String payload = baseWinToSession(zBaseWin);
+//		getRegisteredObjectsNew().put(key, payload);
+//		return key;
+//	}
+//	public synchronized String registerObject(String pos, JBaseWin zBaseWin) throws Exception {
+//		if (zBaseWin == null)
+//			return null;
+//		if (reuseIfPresent(pos) != null)
+//			return pos;
+//		this.getRegisteredObjectsNew().put(pos, baseWinToSession(zBaseWin));
+//		return pos;
+//	}
 	public synchronized String registerObject(JBaseWin zBaseWin) throws Exception {
+    if (zBaseWin == null) return null;
+    return registerWinObjectObj(zBaseWin);
+	}
+	public synchronized String registerObject(String pos, JBaseWin zBaseWin) throws Exception {
 		if (zBaseWin == null)
 			return null;
-		String key = zBaseWin.getUniqueId();
-		if (reuseIfPresent(key) != null)
-			return key;
-		String payload = baseWinToSession(zBaseWin);
-		getRegisteredObjectsNew().put(key, payload);
-		return key;
+		if (reuseIfPresent(pos) != null)
+			return pos;
+		this.getRegisteredObjectsNew().put(pos, registerWinObjectObj(zBaseWin));
+		return pos;
 	}
 
 	public static class ReconcileResult {
@@ -1068,8 +1083,8 @@ public class JWebRequest {
 //		if (zOwner.isModeWinLov()) return serializeObject(zOwner);
 //		if (!zOwner.isReaded()) return serializeObject(zOwner);
 
-               String packed = new JWinPackager(null).baseWinToJSON(zOwner);
-               return "obj_t_" + packed;
-        }
+		String packed = new JWinPackager(null).baseWinToJSON(zOwner);
+		return "obj_t_" + packed;
+	}
 
 }
